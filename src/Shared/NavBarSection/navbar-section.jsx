@@ -32,7 +32,7 @@ const NavBarSection = ({ NAV_ITEM_INTI }) => {
 		<div className={""}>
 			<div
 				className={`w-screen h-screen bg-dashboard-color p-10 overflow-x-hidden  ${
-					NAV_VALUE_INIT?.value
+					NAV_VALUE_INIT?.isOpen
 						? "transform -translate-x-[120%] opacity-0"
 						: "transform translate-x-0 opacity-100"
 				} duration-1000 relative z-50 `}
@@ -55,7 +55,7 @@ const NavBarSection = ({ NAV_ITEM_INTI }) => {
 
 			<div
 				className={`w-[15%] h-full absolute top-0 left-0 bg-ternary-color duration-300 z-[100] flex flex-col justify-between ${
-					!NAV_VALUE_INIT?.value
+					!NAV_VALUE_INIT?.isOpen
 						? "transform scale-x-0 scale-y-0 opacity-10"
 						: "transform scale-x-100 scale-y-100 opacity-100"
 				}`}
@@ -78,7 +78,7 @@ const NavBarSection = ({ NAV_ITEM_INTI }) => {
 												? "bg-effect-color"
 												: "hover:bg-effect-color"
 										} items-center duration-1000 gap-3 cursor-pointer  ${
-											NAV_VALUE_INIT?.value
+											NAV_VALUE_INIT?.isOpen
 												? "animate-bounce-custom"
 												: ""
 										}`}
@@ -104,7 +104,7 @@ const NavBarSection = ({ NAV_ITEM_INTI }) => {
 				<Link to={"/dashboard"}>
 					<li //li for USER HISTORY
 						className={`text-dark-common-color flex  py-3 px-2 mt-auto hover:bg-effect-color items-center duration-500 gap-3 cursor-pointer  ${
-							NAV_VALUE_INIT?.value ? "animate-bounce-custom" : ""
+							NAV_VALUE_INIT?.isOpen ? "animate-bounce-custom" : ""
 						}`}
 						onClick={() => {
 							dispatch(

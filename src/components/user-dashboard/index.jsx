@@ -7,14 +7,14 @@ const NAV_ITEM_INTI = [
 		title: "UPDATE DATA",
 		buttonTitle: "Update",
 		icon: "pen-to-square",
-		link: "/dashboard/create-new-user",
+		link: "/dashboard/update-data",
 		id: "adminNav#1",
 	},
 	{
 		title: "USER HISTORY",
 		buttonTitle: "View History",
 		icon: "arrows-rotate",
-		link: "/dashboard/transfer-user?s_i=12",
+		link: "/dashboard/user-history?s_i=12",
 		id: "adminNav#2",
 	},
 ];

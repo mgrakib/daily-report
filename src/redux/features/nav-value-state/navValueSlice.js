@@ -3,8 +3,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-	value: false,
-	activeNav: "CREATE NEW USER",
+	isOpen: false,
+	activeNav: "",
 };
 export const navStateValueSlice = createSlice({
 	name: "navStateValue",
@@ -12,8 +12,8 @@ export const navStateValueSlice = createSlice({
 	reducers: {
         changeNavState: (state, {payload}) => {
             
-				(state.value = payload.value),
-				(state.activeNav = payload.activeNav);
+				(state.isOpen = payload.isOpen),
+					(state.activeNav = payload.activeNav);
 		},
 	},
 });

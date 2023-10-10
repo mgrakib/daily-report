@@ -19,15 +19,8 @@ const NavCard = ({
 	return (
 		<div
 			onClick={
-				() => dispatch(changeNavState({activeNav: title,
-					value: true
-				}))
-				
-				// setNavValue(pre => ({
-				// 	...navValue,
-				// 	activeNav: title,
-				// 	value: true,
-				// }))
+				() =>
+					dispatch(changeNavState({ activeNav: title, isOpen: true }))
 			}
 			className='bg-ternary-color px-5 py-3 inline-block rounded-md shadow h-[150px] cursor-pointer relative hover:-translate-y-1 duration-150 hover:shadow-[0_0_4px_0px_rgba(255,255,255,.5)] w-full'
 		>

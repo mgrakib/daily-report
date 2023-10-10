@@ -1,9 +1,8 @@
+/** @format */
 
-import NavBarSection from '../../Shared/NavBarSection/navbar-section';
-
+import NavBarSection from "../../Shared/NavBarSection/navbar-section";
 
 const NAV_ITEM_INTI = [
-	
 	{
 		title: "CREATE NEW USER",
 		buttonTitle: "Create",
@@ -42,13 +41,10 @@ const NAV_ITEM_INTI = [
 ];
 
 const AdminDashboard = () => {
-
-   
-    return (
+	return (
 		<>
 			<div>
 				<NavBarSection NAV_ITEM_INTI={NAV_ITEM_INTI} />
-				
 			</div>
 		</>
 	);
