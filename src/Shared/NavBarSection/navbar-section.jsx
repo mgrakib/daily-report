@@ -12,30 +12,27 @@ import { BsGrid1X2 } from "react-icons/bs";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { changeNavState } from "../../redux/features/nav-value-state/navValueSlice";
 
 
 
-const NAV_VALUE_INIT = {
-	value: false,
-	activeNav: "CREATE NEW USER",
-};
+
 
 const NavBarSection = ({ NAV_ITEM_INTI }) => {
-	// console.log(NAV_ITEM_INTI);
-	const [navValue, setNavValue] = useState({ ...NAV_VALUE_INIT });
-	const [navPosition, setNavPosition] = useState(navValue?.value);
+	const NAV_VALUE_INIT = useSelector(state => state.navReducer);
+	const dispatch = useDispatch()
+	
+	
 	
 	const handelActiveRouter = (title) => {
-		setNavValue(pre => ({
-			...pre,
-			activeNav: title
-		}));
+		dispatch(changeNavState({ ...NAV_VALUE_INIT, activeNav: title }));
 	}
 	return (
 		<div className={""}>
 			<div
 				className={`w-screen h-screen bg-dashboard-color p-10 overflow-x-hidden  ${
-					navValue?.value
+					NAV_VALUE_INIT?.value
 						? "transform -translate-x-[120%] opacity-0"
 						: "transform translate-x-0 opacity-100"
 				} duration-1000 relative z-50 `}
@@ -50,8 +47,6 @@ const NavBarSection = ({ NAV_ITEM_INTI }) => {
 								title={navItem.title}
 								buttonTitle={navItem.buttonTitle}
 								Icon={navItem.icon}
-								setNavValue={setNavValue}
-								navValue={navValue}
 							/>
 						</Link>
 					))}
@@ -60,7 +55,7 @@ const NavBarSection = ({ NAV_ITEM_INTI }) => {
 
 			<div
 				className={`w-[15%] h-full absolute top-0 left-0 bg-ternary-color duration-300 z-[100] flex flex-col justify-between ${
-					!navValue?.value
+					!NAV_VALUE_INIT?.value
 						? "transform scale-x-0 scale-y-0 opacity-10"
 						: "transform scale-x-100 scale-y-100 opacity-100"
 				}`}
@@ -68,7 +63,6 @@ const NavBarSection = ({ NAV_ITEM_INTI }) => {
 				<ul className='mt-10 flex flex-col gap-2 overflow-x-hidden'>
 					<div>
 						{NAV_ITEM_INTI.map(navItem => {
-							console.log(navItem);
 							return (
 								<Link
 									key={navItem.id}
@@ -79,12 +73,12 @@ const NavBarSection = ({ NAV_ITEM_INTI }) => {
 								>
 									<li //li for create new user
 										className={`text-dark-common-color flex  py-3 px-2 ${
-											navValue.activeNav ===
+											NAV_VALUE_INIT.activeNav ===
 											`${navItem?.title}`
 												? "bg-effect-color"
 												: "hover:bg-effect-color"
 										} items-center duration-1000 gap-3 cursor-pointer  ${
-											navPosition
+											NAV_VALUE_INIT?.value
 												? "animate-bounce-custom"
 												: ""
 										}`}
@@ -110,14 +104,15 @@ const NavBarSection = ({ NAV_ITEM_INTI }) => {
 				<Link to={"/dashboard"}>
 					<li //li for USER HISTORY
 						className={`text-dark-common-color flex  py-3 px-2 mt-auto hover:bg-effect-color items-center duration-500 gap-3 cursor-pointer  ${
-							navPosition ? "animate-bounce-custom" : ""
+							NAV_VALUE_INIT?.value ? "animate-bounce-custom" : ""
 						}`}
 						onClick={() => {
-							setNavValue(pre => ({
-								...pre,
-								value: false,
-								activeNav: "CREATE NEW USER",
-							}));
+							dispatch(
+								changeNavState({
+									value: false,
+									activeNav: "CREATE NEW USER",
+								})
+							);
 						}}
 					>
 						<span>

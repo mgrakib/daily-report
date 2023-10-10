@@ -3,6 +3,8 @@ import { Button } from "@mui/material";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useDispatch } from "react-redux";
+import { changeNavState } from "../../redux/features/nav-value-state/navValueSlice";
 library.add(fas);
 
 const NavCard = ({
@@ -12,14 +14,20 @@ const NavCard = ({
 	setNavValue,
 	navValue,
 }) => {
+
+	const dispatch = useDispatch()
 	return (
 		<div
-			onClick={() =>
-				setNavValue(pre => ({
-					...navValue,
-					activeNav: title,
-					value: true,
+			onClick={
+				() => dispatch(changeNavState({activeNav: title,
+					value: true
 				}))
+				
+				// setNavValue(pre => ({
+				// 	...navValue,
+				// 	activeNav: title,
+				// 	value: true,
+				// }))
 			}
 			className='bg-ternary-color px-5 py-3 inline-block rounded-md shadow h-[150px] cursor-pointer relative hover:-translate-y-1 duration-150 hover:shadow-[0_0_4px_0px_rgba(255,255,255,.5)] w-full'
 		>
