@@ -1,0 +1,41 @@
+/** @format */
+import { Button } from "@mui/material";
+import { FiUserPlus } from "react-icons/fi";
+
+const NavCard = ({
+	title = "Card New User",
+	buttonTitle = "create",
+	Icon,
+	setNavValue,
+	navValue,
+}) => {
+	return (
+		<div
+			onClick={() =>
+				setNavValue(pre => ({
+					...navValue,
+					activeNav: title,
+					value: true
+				}))
+			}
+			className='bg-ternary-color px-5 py-3 inline-block rounded-md shadow h-[150px] cursor-pointer relative hover:-translate-y-1 duration-150 hover:shadow-[0_0_4px_0px_rgba(255,255,255,.5)] w-full'
+		>
+			<div className='flex h-full gap-2 '>
+				<div className='flex flex-col flex-1'>
+					<h3 className='text-dark-common-color text-2xl '>
+						{title}
+					</h3>
+					<div className='mt-auto'>
+						<Button variant='contained'>{buttonTitle}</Button>
+					</div>
+				</div>
+
+				<div className='w-[20%] flex items-center justify-center h-full text-4xl text-dark-common-color'>
+					{Icon}
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export default NavCard;

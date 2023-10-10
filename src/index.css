@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+}
+html, body {
+  height: 100%;
+}
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+input, button, textarea, select {
+  font: inherit;
+}
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+#root, #__next {
+  isolation: isolate;
+}
+
+
+:root {
+  --primary-color: #fff;
+  --secondary-color: #DE4139;
+  --ternary-color: #060621;
+  --common-color: #000000;
+  --gray-color: #717974;
+  --action-color: #623885;
+  --dashboard-color: #051336;
+  --effect-color: #061940;
+
+  --dark-primary-color: #0F1729;
+  --dark-secondary-color: #83FFF9;
+  --dark-common-color: #fff;
+  --dark-gray-color: #717974;
+  --dark-dashboard-color: #151521;
+}
+
+@keyframes bounce {
+  0%{
+    transform: translateX(-90%);
+  }
+  70% {
+    transform: translateX(10%);
+  }
+  85% {
+    transform: translateX(10%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
