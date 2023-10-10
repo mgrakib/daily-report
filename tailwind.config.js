@@ -14,6 +14,7 @@ export default {
 				"secondary-color": "var(--secondary-color)",
 				"ternary-color": "var(--ternary-color)",
 				"effect-color": "var(--effect-color)",
+				"field-color": "var(--field-color)",
 				"common-color": "var( --common-color)",
 				"gray-color": "var(  --gray-color)",
 				"action-color": "var(--action-color)",
