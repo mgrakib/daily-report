@@ -10,10 +10,9 @@ export const navStateValueSlice = createSlice({
 	name: "navStateValue",
 	initialState,
 	reducers: {
-        changeNavState: (state, {payload}) => {
-            
-				(state.isOpen = payload.isOpen),
-					(state.activeNav = payload.activeNav);
+		changeNavState: (state, { payload }) => {
+			(state.isOpen = payload.isOpen),
+				(state.activeNav = payload.activeNav);
 		},
 	},
 });

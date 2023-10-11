@@ -1,23 +1,29 @@
 /** @format */
 
-import { useForm } from "react-hook-form"
+import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import useChangeNavStatus from "../../hooks/useChangeNavStatus/useChangeNavStatus";
 import { changeNavState } from "../../redux/features/nav-value-state/navValueSlice";
 import { Button, Radio } from "@mui/material";
 import { useState } from "react";
-import { pink } from "@mui/material/colors";
+import { useCreateNewUserMutation } from "../../redux/createApi/createApi";
+import GlobalLoading from "../../Shared/global-loading/global-loading";
 
 const CreateNewUser = () => {
 	//change automatically nav name and state
 	const dispatch = useDispatch();
 	useChangeNavStatus(dispatch, changeNavState, true, "CREATE NEW USER");
 
-	const [selectedValue, setSelectedValue] = useState("male");
+	const [selectedGender, setSelectedGender] = useState("male");
 	const handleChange = event => {
-		setSelectedValue(event.target.value);
+		setSelectedGender(event.target.value);
 	};
 
+	const [createUser, { data: createdUser, isLoading:createUserIsLoading }] =
+		useCreateNewUserMutation();
+
+	
+	
 	const {
 		register,
 		handleSubmit,
@@ -25,7 +31,19 @@ const CreateNewUser = () => {
 		formState: { errors },
 	} = useForm();
 
-	const onSubmit = data => console.log(data);
+	const onSubmit = data => {
+
+		const userInfo = {
+			...data,
+			userGender: selectedGender,
+		};
+
+		createUser(userInfo);
+		
+	};
+
+
+	
 	return (
 		<div
 			style={{
@@ -143,6 +161,30 @@ const CreateNewUser = () => {
 									</p>
 								)}
 							</div>
+
+							{/* user password  */}
+							<div>
+								<div>
+									<label htmlFor=''>Password_</label>
+								</div>
+								<input
+									className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold'
+									{...register("password", {
+										required: true,
+									})}
+									aria-invalid={
+										errors.password ? "true" : "false"
+									}
+								/>
+								{errors.password?.type === "required" && (
+									<p
+										role='alert'
+										className='text-[12px] text-red-500'
+									>
+										Password is required
+									</p>
+								)}
+							</div>
 							{/* user Gender  */}
 							<div className='col-span-2'>
 								<div>
@@ -151,7 +193,7 @@ const CreateNewUser = () => {
 								<div className='flex items-center justify-between max-w-[70%]'>
 									<div className='flex items-center gap-2'>
 										<Radio
-											checked={selectedValue === "male"}
+											checked={selectedGender === "male"}
 											onChange={handleChange}
 											value='male'
 											name='radio-buttons'
@@ -169,7 +211,9 @@ const CreateNewUser = () => {
 
 									<div className='flex items-center gap-2'>
 										<Radio
-											checked={selectedValue === "female"}
+											checked={
+												selectedGender === "female"
+											}
 											onChange={handleChange}
 											value='female'
 											name='radio-buttons'
@@ -185,7 +229,7 @@ const CreateNewUser = () => {
 									</div>
 									<div className='flex items-center gap-2'>
 										<Radio
-											checked={selectedValue === "null"}
+											checked={selectedGender === "null"}
 											onChange={handleChange}
 											value={"null"}
 											name='radio-buttons'
@@ -207,6 +251,7 @@ const CreateNewUser = () => {
 
 						<div>
 							<Button
+								disabled={createUserIsLoading}
 								type='submit'
 								className='w-full py-2 bg-[#3498DB] mt-5 text-white'
 							>
@@ -216,6 +261,8 @@ const CreateNewUser = () => {
 					</form>
 				</div>
 			</div>
+
+			<GlobalLoading isOpen={createUserIsLoading} />
 		</div>
 	);
 };
