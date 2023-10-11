@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 const initialState = {
-	isOpen: "vlaue",
+	isOpen: false,
 	stationsName: [
 		"Bagerhat District Jail",
 		"Bandarban District Jail",
@@ -78,9 +78,12 @@ export const workStationList = createSlice({
 	name: "workStationList",
 	initialState,
 	reducers: {
-		
+		changeStatus: (state, { payload}) => {
+			state.isOpen = payload;
+		}
 	},
 });
 
 
+export const { changeStatus } = workStationList.actions;
 export default workStationList.reducer;

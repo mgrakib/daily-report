@@ -8,44 +8,65 @@ import { useForm } from "react-hook-form";
 
 import { Button, Checkbox, Tooltip } from "@mui/material";
 
-import { useGetSingleUserQuery } from "../../redux/createApi/createApi";
+import {
+	useGetSingleUserQuery,
+	useTransferUserMutation,
+} from "../../redux/createApi/createApi";
 import GlobalLoading from "../../Shared/global-loading/global-loading";
 import { useEffect, useState } from "react";
+import { changeStatus } from "../../redux/features/work-station-list/work-station-list";
 const TransferUser = () => {
-	const [targetUser, setTargetUser] = useState(null);
+	const [targetUser, setTargetUser] = useState(null); //this value will display at the disabled field
+
 	//change automatically nav name and state
 	const dispatch = useDispatch();
 	useChangeNavStatus(dispatch, changeNavState, true, "TRANSFER USER");
+
 	const { isOpen, stationsName } = useSelector(
 		state => state.workStationList
-	);
+	); //get stations name
+
+	const [
+		transferUser,
+		{ data: transferUserInfo, isLoading: transferUserIsLoading },
+	] = useTransferUserMutation(); //action for transfer user
 
 	const {
 		register,
 		handleSubmit,
 		watch,
+		reset,
 		formState: { errors },
-	} = useForm();
-
-	const onSubmit = data => {
-		const userInfo = {
-			...data,
-		};
-
-		console.log(userInfo);
-	};
+	} = useForm(); //form attribute
 
 	const { data: singleUser, isLoading } = useGetSingleUserQuery({
 		key: "userServiceID",
 		value: watch("userServiceID"),
-	});
+	}); // api request for track user on service id
 
 	useEffect(() => {
+		//load target user value to display disable filed
 		setTargetUser(singleUser?.user);
 	}, [singleUser]);
-
-	
 	const label = { inputProps: { "aria-label": "Checkbox demo" } };
+
+	useEffect(() => {
+		//change the show station name status depend on target user
+		dispatch(changeStatus(singleUser?.user ? true : false));
+	}, [singleUser?.user, dispatch]);
+
+	const onSubmit = data => {
+		//handel submit to transfer the user
+		const s_i = data.userServiceID;
+		const new_s = data.newWorkStation;
+		transferUser({ s_i, new_s }).then(res => {
+			reset();
+		}).catch(e => {
+			console.log(e)
+		})
+	};
+
+	console.log(transferUserInfo, transferUserIsLoading);
 	return (
 		<div
 			style={{
@@ -145,32 +166,56 @@ const TransferUser = () => {
 							{/* new Station  */}
 							<div>
 								<div>
-									<label htmlFor=''>New Station</label>
+									<label htmlFor=''>New Station_</label>
 								</div>
-								<select
-									className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold'
-									{...register("password", {
-										required: true,
-									})}
-									aria-invalid={
-										errors.password ? "true" : "false"
-									}
-								>
-									<option
-										value=''
-										className='hidden'
+								<Tooltip title='First '>
+									<select
+										className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold'
+										{...register("newWorkStation", {
+											required: true,
+										})}
+										aria-invalid={
+											errors.newWorkStation
+												? "true"
+												: "false"
+										}
 									>
-										female
-									</option>
-									<option value='male'>male</option>
-									<option value='other'>other</option>
-								</select>
-								{errors.password?.type === "required" && (
+										{isOpen && (
+											<>
+												<option
+													value=''
+													className='hidden'
+												>
+													Select Next Destination_
+												</option>
+
+												{stationsName.map(
+													stationName => (
+														<option
+															className={`${
+																stationName ===
+																targetUser?.currentWorkStation && 'bg-red-100'
+															}`}
+															disabled={
+																stationName ===
+																targetUser?.currentWorkStation
+															}
+															key={stationName}
+														>
+															{stationName}
+														</option>
+													)
+												)}
+											</>
+										)}
+									</select>
+								</Tooltip>
+								{errors.newWorkStation?.type === "required" && (
 									<p
 										role='alert'
 										className='text-[12px] text-red-500'
 									>
-										Password is required
+										New Station is required
 									</p>
 								)}
 							</div>
@@ -187,7 +232,7 @@ const TransferUser = () => {
 												required: true,
 											})}
 											aria-invalid={
-												errors.password
+												errors.isAgree
 													? "true"
 													: "false"
 											}
@@ -198,7 +243,8 @@ const TransferUser = () => {
 										/>
 
 										<label htmlFor=''>
-											I agree with the trams and condition
+											I agree with the trams and
+											condition_
 										</label>
 									</div>
 								</div>
@@ -216,18 +262,18 @@ const TransferUser = () => {
 
 						<div>
 							<Button
-								disabled={false} //TODO: change real vlaue
+								disabled={!targetUser} //TODO: change real vlaue
 								type='submit'
 								className='w-full py-2 bg-[#3498DB] mt-5 text-white'
 							>
-								Transfer
+								Transfer_
 							</Button>
 						</div>
 					</form>
 				</div>
 			</div>
 			<GlobalLoading
-				isOpen={false} //TODO: change real vlaue
+				isOpen={transferUserIsLoading} //TODO: change real vlaue
 			/>
 		</div>
 	);

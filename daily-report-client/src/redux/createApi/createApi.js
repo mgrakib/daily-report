@@ -1,6 +1,6 @@
+/** @format */
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
 
 export const dailyReportAPI = createApi({
 	reducerPath: "dailyReportAPIS",
@@ -17,14 +17,23 @@ export const dailyReportAPI = createApi({
 			}),
 		}),
 
-		getSingleUser: builder.query({
-			query: ({key, value}) => ({
+		getSingleUser: builder.query({ //TODO: manage cash when transfer but don't change data when retype 
+			query: ({ key, value }) => ({
 				url: `/u/user?key=${key}&value=${value}`,
 			}),
+		}),
+		transferUser: builder.mutation({
+			query: ({ s_i, new_s }) => ({
+				url: `/u/user?s_i=${s_i}&new_s=${new_s}`,
+				method: "PATCH",
+			}),
+			invalidates: [{ endpoint: "getSingleUser", args: { key: "s_i" } }],
 		}),
 	}),
 });
 
-
-
-export const { useCreateNewUserMutation, useGetSingleUserQuery } = dailyReportAPI;
+export const {
+	useCreateNewUserMutation,
+	useGetSingleUserQuery,
+	useTransferUserMutation,
+} = dailyReportAPI;
