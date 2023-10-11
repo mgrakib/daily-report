@@ -6,33 +6,20 @@ import { changeNavState } from "../../redux/features/nav-value-state/navValueSli
 
 import { useForm } from "react-hook-form";
 
-import { Button, Checkbox, Radio, Tooltip } from "@mui/material";
-import { useState } from "react";
-import {
-	useCreateNewUserMutation,
-	useGetSingleUserQuery,
-} from "../../redux/createApi/createApi";
-import GlobalLoading from "../../Shared/global-loading/global-loading";
-const TransferUser = () => {
-	const [userServiceID, setUserServiceID] = useState(null);
+import { Button, Checkbox, Tooltip } from "@mui/material";
 
+import { useGetSingleUserQuery } from "../../redux/createApi/createApi";
+import GlobalLoading from "../../Shared/global-loading/global-loading";
+import { useEffect, useState } from "react";
+const TransferUser = () => {
+	const [targetUser, setTargetUser] = useState(null);
 	//change automatically nav name and state
 	const dispatch = useDispatch();
 	useChangeNavStatus(dispatch, changeNavState, true, "TRANSFER USER");
-
-	const [selectedGender, setSelectedGender] = useState("male");
-	const handleChange = event => {
-		setSelectedGender(event.target.value);
-	};
-
-	const [createUser, { data: createdUser, isLoading: createUserIsLoading }] =
-		useCreateNewUserMutation();
 	const { isOpen, stationsName } = useSelector(
 		state => state.workStationList
-	); 
+	);
 
-
-	console.log(isOpen, stationsName);
 	const {
 		register,
 		handleSubmit,
@@ -43,10 +30,9 @@ const TransferUser = () => {
 	const onSubmit = data => {
 		const userInfo = {
 			...data,
-			userGender: selectedGender,
 		};
 
-		createUser(userInfo);
+		console.log(userInfo);
 	};
 
 	const { data: singleUser, isLoading } = useGetSingleUserQuery({
@@ -54,9 +40,11 @@ const TransferUser = () => {
 		value: watch("userServiceID"),
 	});
 
-	
-	const { userEmail, userName, currentWorkStation } = singleUser?.user || {};
+	useEffect(() => {
+		setTargetUser(singleUser?.user);
+	}, [singleUser]);
 
+	
 	const label = { inputProps: { "aria-label": "Checkbox demo" } };
 	return (
 		<div
@@ -86,7 +74,6 @@ const TransferUser = () => {
 									{...register("userServiceID", {
 										required: true,
 									})}
-									value={userServiceID}
 									aria-invalid={
 										errors.userServiceID ? "true" : "false"
 									}
@@ -111,26 +98,11 @@ const TransferUser = () => {
 									disableFocusListener
 								>
 									<input
-										value={userName}
-										
+										value={targetUser?.userName ?? ""}
 										disabled
 										className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold cursor-not-allowed'
-										{...register("userName", {
-											required: true,
-										})}
-										aria-invalid={
-											errors.userName ? "true" : "false"
-										}
 									/>
 								</Tooltip>
-								{errors.userName?.type === "required" && (
-									<p
-										role='alert'
-										className='text-[12px] text-red-500'
-									>
-										User name is required
-									</p>
-								)}
 							</div>
 
 							{/* user Email  */}
@@ -143,25 +115,11 @@ const TransferUser = () => {
 									disableFocusListener
 								>
 									<input
-										value={userEmail}
+										value={targetUser?.userEmail ?? ""}
 										disabled
 										className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold cursor-not-allowed'
-										{...register("userEmail", {
-											required: true,
-										})}
-										aria-invalid={
-											errors.userEmail ? "true" : "false"
-										}
 									/>
 								</Tooltip>
-								{errors.userEmail?.type === "required" && (
-									<p
-										role='alert'
-										className='text-[12px] text-red-500'
-									>
-										Email is required
-									</p>
-								)}
 							</div>
 
 							{/* user Current Station  */}
@@ -174,28 +132,14 @@ const TransferUser = () => {
 									disableFocusListener
 								>
 									<input
-										value={currentWorkStation}
+										value={
+											targetUser?.currentWorkStation ?? ""
+										}
 										disabled
 										type='text'
 										className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold cursor-not-allowed'
-										{...register("currentStation", {
-											required: true,
-										})}
-										aria-invalid={
-											errors.currentStation
-												? "true"
-												: "false"
-										}
 									/>
 								</Tooltip>
-								{errors.currentStation?.type === "required" && (
-									<p
-										role='alert'
-										className='text-[12px] text-red-500'
-									>
-										Joining Date is required
-									</p>
-								)}
 							</div>
 
 							{/* new Station  */}
@@ -272,7 +216,7 @@ const TransferUser = () => {
 
 						<div>
 							<Button
-								disabled={createUserIsLoading}
+								disabled={false} //TODO: change real vlaue
 								type='submit'
 								className='w-full py-2 bg-[#3498DB] mt-5 text-white'
 							>
@@ -282,8 +226,9 @@ const TransferUser = () => {
 					</form>
 				</div>
 			</div>
-
-			<GlobalLoading isOpen={createUserIsLoading} />
+			<GlobalLoading
+				isOpen={false} //TODO: change real vlaue
+			/>
 		</div>
 	);
 };
