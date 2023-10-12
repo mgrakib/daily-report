@@ -3,6 +3,9 @@
 import { Outlet } from "react-router-dom";
 import AdminDashboard from "./components/AdminDashboard";
 import UserDashboard from "./components/user-dashboard";
+import TESt from "./test";
+
+
 
 function Dashboard() {
 	
@@ -17,6 +20,8 @@ function Dashboard() {
 				<div className='flex-1'>
 					<Outlet />
 				</div>
+
+				<TESt />
 			</div>
 		</>
 	);

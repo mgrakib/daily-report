@@ -46,11 +46,10 @@ const DownloadReport = () => {
 	
 	const handelSubmit = e => {
 		e.preventDefault();
-	
-
 		console.log( state);
 	};
 
+	
 	useEffect(() => {
 		if (state.individualReportCollops) {
 			setState(pre => ({

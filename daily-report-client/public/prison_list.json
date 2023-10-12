@@ -1,70 +1,92 @@
-[
-    
-	"Bagerhat District Jail",
-	"Bandarban District Jail",
-	"Barguna District Jail",
-	"Barisal Central Jail",
-	"Bhola District Jail",
-	"Bogra District Jail",
-	"Brahmanbaria District Jail",
-	"Chandpur District Jail",
-	"Chapai Nawabganj District Jail",
-	"Chattogram Central Jail",
-	"Chuadanga District Jail",
-	"Comilla District Jail",
-	"Cox's Bazar District Jail",
-	"Dhaka Central Jail",
-	"Dinajpur District Jail",
-	"Faridpur District Jail",
-	"Feni District Jail",
-	"Gaibandha District Jail",
-	"Gazipur District Jail",
-	"Gopalganj District Jail",
-	"Habiganj District Jail",
-	"Jamalpur District Jail",
-	"Jessore Central Jail",
-	"Jhalokati District Jail",
-	"Jhenaidah District Jail",
-	"Joypurhat District Jail",
-	"Kashimpur Central Jail-1",
-	"Kashimpur Central Jail-2",
-	"Kashimpur High security Jail",
-	"Kashimpur Female's Central Jail",
-	"Khagrachari District Jail",
-	"Khulna District Jail",
-	"Kishoreganj District Jail",
-	"Kurigram District Jail",
-	"Kushtia District Jail",
-	"Lakshmipur District Jail",
-	"Lalmonirhat District Jail",
-	"Madaripur District Jail",
-	"Magura District Jail",
-	"Manikganj District Jail",
-	"Meherpur District Jail",
-	"Moulvibazar District Jail",
-	"Munshiganj District Jail",
-	"Mymensingh Central Jail",
-	"Narail District Jail",
-	"Narayanganj District Jail",
-	"Narsingdi District Jail",
-	"Natore District Jail",
-	"Netrokona District Jail",
-	"Nilphamari District Jail",
-	"Noakhali District Jail",
-	"Pabna District Jail",
-	"Panchagarh District Jail",
-	"Patuakhali District Jail",
-	"Pirojpur District Jail",
-	"Rajbari District Jail",
-	"Rajshahi Central Jail",
-	"Rangamati District Jail",
-	"Rangpur Central Jail",
-	"Satkhira District Jail",
-	"Shariatpur District Jail",
-	"Sherpur District Jail",
-	"Sirajganj District Jail",
-	"Sunamganj District Jail",
-	"Sylhet Central Jail",
-	"Tangail District Jail",
-	"Thakurgao District Jailn"
-]
+{
+	"1010|Na": {
+		"10-10-23": {
+			"entry": 100,
+			"release": 100
+		},
+		"11-10-23": {
+			"entry": 101,
+			"release": 101
+		}
+	},
+	"1011|Na": {
+		"10-10-23": {
+			"entry": 200,
+			"release": 200
+		},
+		"11-10-23": {
+			"entry": 201,
+			"release": 201
+		}
+	},
+	"jailWader|Na": {
+		"10-10-23": {
+			"entry": 300,
+			"release": 300
+		},
+		"11-10-23": {
+			"entry": 301,
+			"release": 301
+		}
+	},
+	"1012|Dh": {
+		"10-10-23": {
+			"entry": 100,
+			"release": 100
+		},
+		"11-10-23": {
+			"entry": 101,
+			"release": 101
+		}
+	},
+	"1013|Dh": {
+		"10-10-23": {
+			"entry": 200,
+			"release": 200
+		},
+		"11-10-23": {
+			"entry": 201,
+			"release": 201
+		}
+	},
+	"jailWader|Dh": {
+		"10-10-23": {
+			"entry": 300,
+			"release": 300
+		},
+		"11-10-23": {
+			"entry": 301,
+			"release": 301
+		}
+	},
+	"1014|Ba": {
+		"10-10-23": {
+			"entry": 100,
+			"release": 100
+		},
+		"11-10-23": {
+			"entry": 101,
+			"release": 101
+		}
+	},
+	"1015|Ba": {
+		"10-10-23": {
+			"entry": 200,
+			"release": 200
+		},
+		"11-10-23": {
+			"entry": 201,
+			"release": 201
+		}
+	},
+	"jailWader|Ba": {
+		"10-10-23": {
+			"entry": 300,
+			"release": 300
+		},
+		"11-10-23": {
+			"entry": 301,
+			"release": 301
+		}
+	}
+}
