@@ -1,7 +1,9 @@
 /** @format */
 const { format } = require("date-fns");
-const Users = require("../models/user");
-const UserPreviousWorkStationHistory = require("../models/user-previouse-worstation-history");
+const Users = require("../models/user"); //model
+const UserPreviousWorkStationHistory = require("../models/user-previouse-worstation-history"); //model
+
+const { updateReportDocument } = require("./reportService"); //report service
 
 const findUser = (key, value) => {
 	if (key === "_id") {
@@ -34,7 +36,12 @@ const createNewUser = async (
 const transferUserService = async (userServiceID, newStationName) => {
 	const user = await findUser("userServiceID", userServiceID);
 
-	console.log(user);
+	await updateReportDocument(
+		userServiceID,
+		newStationName,
+		(currentStation = user?.currentWorkStation)
+	);
+	
 	const updateWorkStationHistory =
 		await UserPreviousWorkStationHistory.findOneAndUpdate(
 			{

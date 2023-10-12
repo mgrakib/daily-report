@@ -22,7 +22,6 @@ const transferUser = async (req, res, next) => {
 			userServiceID,
 			newStationName
 		);
-
 		if (!userUpdate) {
 			const err = error("User not found", 400);
 			throw err;
@@ -33,6 +32,8 @@ const transferUser = async (req, res, next) => {
 		next(e);
 	}
 };
+
+
 
 module.exports = {
 	getSingleUser,
