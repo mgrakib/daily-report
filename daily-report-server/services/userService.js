@@ -4,7 +4,9 @@ const Users = require("../models/user"); //model
 const UserPreviousWorkStationHistory = require("../models/user-previouse-worstation-history"); //model
 
 const { updateReportDocument } = require("./reportService"); //report service
-const { updateWorkStationOpeInfoHistory } = require("./workstation-infoService");
+const {
+	updateWorkStationOpeInfoHistory,
+} = require("./workstation-infoService");
 
 const findUser = (key, value) => {
 	if (key === "_id") {
@@ -67,7 +69,7 @@ const transferUserService = async (userServiceID, newStationName) => {
 				upsert: true,
 			}
 		);
-	
+
 	const userUpdate = await Users.findOneAndUpdate(
 		{ userServiceID },
 		{
@@ -80,11 +82,18 @@ const transferUserService = async (userServiceID, newStationName) => {
 		}
 	);
 	return userUpdate;
-	
+};
+
+const getUsersArray = async userServiceIDArr => {
+	const usersList = await Users.find({
+		userServiceID: { $in: userServiceIDArr.map(id => id.toString()) },
+	});
+	return usersList;
 };
 
 module.exports = {
 	findUser,
 	createNewUser,
 	transferUserService,
+	getUsersArray,
 };

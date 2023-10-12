@@ -2,6 +2,9 @@
 
 const { format } = require("date-fns");
 const ReportModel = require("../models/reports");
+const WorkStationOpeSchema = require("../models/workstation-info");
+const Active_LockupSchema = require("../models/activeLockup");
+
 const updateReportDocument = async (
 	userServiceID,
 	newStationName,
@@ -9,6 +12,24 @@ const updateReportDocument = async (
 ) => {
 	const key = `${userServiceID}|${currentStation}`;
 	const newKey = `${userServiceID}|${newStationName}`;
+
+	const jailWarderHistory = await ReportModel.findOne({
+		[`jailWarder|${newStationName}`]: { $exists: true },
+	});
+
+
+	if (!jailWarderHistory && newStationName !=="NTMC") {
+		// add jailWarder
+		const reportData = new ReportModel({
+			[`jailWarder|${newStationName}`]: {
+				[format(new Date(), "yyyy-MM-dd")]: {
+					entry: 0,
+					release: 0,
+				},
+			},
+		});
+		await reportData.save();
+	}
 
 	const userPreviousHistory = await ReportModel.findOne({
 		[key]: { $exists: true },
@@ -29,6 +50,15 @@ const updateReportDocument = async (
 	}
 };
 
+const getWorkStationOpe = async stationName => {
+	const stationInfo = await WorkStationOpeSchema.findOne({
+		[stationName]: { $exists: true },
+	});
+	const userServiceIDArr = stationInfo[stationName];
+
+	return userServiceIDArr;
+};
+
 const updateEntryRelease = async data => {
 	const newDate = format(new Date(), "yyyy-MM-dd");
 
@@ -45,7 +75,10 @@ const updateEntryRelease = async data => {
 					filter: { [userServiceID]: { $exists: true } },
 					update: {
 						$set: {
-							[`${userServiceID}.${newDate}`]: { entry, release },
+							[`${userServiceID}.${newDate}`]: {
+								entry: parseInt(entry),
+								release: parseInt(release),
+							},
 						},
 					},
 					upsert: true,
@@ -56,8 +89,25 @@ const updateEntryRelease = async data => {
 	await ReportModel.bulkWrite(bulkOperations);
 };
 
-
+const updateActiveLockup = async data => {
+	const { activePrison, lockupPrison, stationName } = data || {};
+	const newDate = format(new Date(), "yyyy-MM-dd");
+	const newValue = await Active_LockupSchema.updateOne(
+		{ [stationName]: { $exists: true } },
+		{
+			$set: {
+				[`${stationName}.${newDate}`]: {
+					activePrison: parseInt(activePrison),
+					lockupPrison: parseInt(lockupPrison),
+				},
+			},
+		},
+		{ upsert: true }
+	);
+}
 module.exports = {
 	updateReportDocument,
 	updateEntryRelease,
+	getWorkStationOpe,
+	updateActiveLockup,
 };

@@ -1,8 +1,9 @@
 const router = require('express').Router();
-const { updateReport } = require("../controller/report");
+const { updateReport, getOpeList } = require("../controller/report");
 
 
 router.post("/update-report", updateReport);
+router.get("/workstation-ope", getOpeList);
 
 
 
