@@ -4,6 +4,7 @@ const Users = require("../models/user"); //model
 const UserPreviousWorkStationHistory = require("../models/user-previouse-worstation-history"); //model
 
 const { updateReportDocument } = require("./reportService"); //report service
+const { updateWorkStationOpeInfoHistory } = require("./workstation-infoService");
 
 const findUser = (key, value) => {
 	if (key === "_id") {
@@ -41,7 +42,12 @@ const transferUserService = async (userServiceID, newStationName) => {
 		newStationName,
 		(currentStation = user?.currentWorkStation)
 	);
-	
+
+	await updateWorkStationOpeInfoHistory(
+		userServiceID,
+		newStationName,
+		(currentStation = user?.currentWorkStation)
+	);
 	const updateWorkStationHistory =
 		await UserPreviousWorkStationHistory.findOneAndUpdate(
 			{
@@ -61,16 +67,20 @@ const transferUserService = async (userServiceID, newStationName) => {
 				upsert: true,
 			}
 		);
-
+	
 	const userUpdate = await Users.findOneAndUpdate(
 		{ userServiceID },
 		{
 			currentWorkStation: newStationName,
 			userJoiningDate: format(new Date(), "yyyy-MM-dd"),
 			lastTransferDate: format(new Date(), "yyyy-MM-dd"),
+			profileStatus: `${
+				newStationName !== "NTMC" ? "ACTIVE" : "DEPRECATED"
+			}`,
 		}
 	);
 	return userUpdate;
+	
 };
 
 module.exports = {

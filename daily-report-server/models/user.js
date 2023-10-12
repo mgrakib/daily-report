@@ -48,7 +48,7 @@ const userSchema = new Schema({
 		type: String,
 		required: true,
 		enum: ["PENDING", "ACTIVE", "DEPRECATED"],
-		default: "ACTIVE",
+		default: "PENDING",
 	},
 });
 
