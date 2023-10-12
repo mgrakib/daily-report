@@ -19,11 +19,9 @@ const CreateNewUser = () => {
 		setSelectedGender(event.target.value);
 	};
 
-	const [createUser, { data: createdUser, isLoading:createUserIsLoading }] =
+	const [createUser, { data: createdUser, isLoading: createUserIsLoading }] =
 		useCreateNewUserMutation();
 
-	
-	
 	const {
 		register,
 		handleSubmit,
@@ -32,18 +30,14 @@ const CreateNewUser = () => {
 	} = useForm();
 
 	const onSubmit = data => {
-
 		const userInfo = {
 			...data,
 			userGender: selectedGender,
 		};
 
 		createUser(userInfo);
-		
 	};
 
-
-	
 	return (
 		<div
 			style={{

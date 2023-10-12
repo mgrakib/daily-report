@@ -4,6 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
 	isOpen: false,
 	stationsName: [
+		"NTMC",
 		"Bagerhat District Jail",
 		"Bandarban District Jail",
 		"Barguna District Jail",
