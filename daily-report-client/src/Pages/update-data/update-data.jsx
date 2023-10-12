@@ -5,37 +5,70 @@ import useChangeNavStatus from "../../hooks/useChangeNavStatus/useChangeNavStatu
 import { changeNavState } from "../../redux/features/nav-value-state/navValueSlice";
 import { useForm } from "react-hook-form";
 import { Button, Radio } from "@mui/material";
-import { useState } from "react";
-import { useCreateNewUserMutation } from "../../redux/createApi/createApi";
+import { useEffect, useState } from "react";
+import { useGetWorkStationOpeQuery, useSubmitDailyReportMutation } from "../../redux/createApi/createApi";
 import GlobalLoading from "../../Shared/global-loading/global-loading";
 import { format } from "date-fns";
+
 const UpdateDate = () => {
+	const station = "Cox's Bazar District Jail";
 	//change automatically nav name and state
 	const dispatch = useDispatch();
 	useChangeNavStatus(dispatch, changeNavState, true, "UPDATE DATA");
 
-	const [selectedGender, setSelectedGender] = useState("male");
-	const handleChange = event => {
-		setSelectedGender(event.target.value);
+	const [state, setState] = useState([]); // state for value 
+
+	const { data: workStationOpe, isLoading: getOperatorsIsLoading } =
+		useGetWorkStationOpeQuery(station); // TODO: change the statation name dynamcit
+
+
+	const [updateReport, { data: updateReportInfo, isLoading:updateReportIsLoading }] = useSubmitDailyReportMutation()
+	
+	useEffect(() => {
+		if (state.length === 0) {
+			//set state value
+			workStationOpe?.usersList.forEach(user => {
+				setState(pre => [
+					...pre,
+					{
+						userServiceID: `${user?.userServiceID}|${user?.currentWorkStation}`,
+						entry: 0,
+						release: 0,
+					},
+				]);
+			});
+		}
+	}, [workStationOpe?.usersList]);
+
+	const handelChange = (e, index) => {
+		const { name, value } = e.target;
+
+		setState(prevState => {
+			const newState = [...prevState];
+			newState[index] = {
+				...newState[index],
+				[name]: value,
+			};
+			return newState;
+		});
 	};
 
-	const [createUser, { data: createdUser, isLoading: createUserIsLoading }] =
-		useCreateNewUserMutation();
+	console.log(updateReportInfo, updateReportIsLoading);
 
-	const {
-		register,
-		handleSubmit,
-		watch,
-		formState: { errors },
-	} = useForm();
+	
+	const onSubmit = e => {
+		e.preventDefault();
+		const jailWarderEntry = e.target.jailWarderEntry.value;
+		const jailWarderRelease = e.target.jailWarderRelease.value;
+		const newValue = [...state]
+		newValue.push({
+			userServiceID: `jailWarder|${station}`,
+			entry: jailWarderEntry,
+			release: jailWarderRelease,
+		});
 
-	const onSubmit = data => {
-		const userInfo = {
-			...data,
-			userGender: selectedGender,
-		};
+		updateReport(newValue);
 
-		createUser(userInfo);
 	};
 	return (
 		<div
@@ -56,253 +89,131 @@ const UpdateDate = () => {
 							</span>
 						</h3>
 
-						<div className='text-2xl font-semibold '>
-							{format(new Date(), "yyyy-MM-dd")}
+						<div>
+							<h3 className='text-2xl font-semibold '>
+								{format(new Date(), "yyyy-MM-dd")}
+							</h3>
+
+							<div className="text-[14px] py-[2px] px-[4px] bg-red-100 text-dashboard-color rounded-sm">
+								Update Incomplete
+							</div>
 						</div>
 					</div>
 
 					<form
 						className='font-light mt-7 '
-						onSubmit={handleSubmit(onSubmit)}
+						onSubmit={onSubmit}
 					>
 						<div className='flex flex-col gap-5'>
+							{workStationOpe?.usersList?.map((user, index) => {
+								const { userName } = user || {};
+								return (
+									<div key={user._id}>
+										<div>
+											<p>{userName}_</p>
+										</div>
+										<div className='grid grid-cols-2 gap-x-10 gap-y-7'>
+											{/*ope Entry  */}
+											<div>
+												<div>
+													<label htmlFor=''>
+														Entry_
+													</label>
+												</div>
+												<input
+													onChange={e =>
+														handelChange(e, index)
+													}
+													value={
+														state?.[index]?.entry
+													}
+													name={`entry`}
+													className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold bg-red-200'
+												/>
+											</div>
+
+											{/*ope Release  */}
+											<div>
+												<div>
+													<label htmlFor=''>
+														Release_
+													</label>
+												</div>
+												<input
+													onChange={e =>
+														handelChange(e, index)
+													}
+													value={
+														state?.[index]?.release
+													}
+													name={`release`}
+													className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold bg-green-200'
+												/>
+											</div>
+										</div>
+									</div>
+								);
+							})}
+
 							<div>
 								<div>
-									<p>MG Rakib_</p>
+									<p>Jail Warder_</p>
 								</div>
 								<div className='grid grid-cols-2 gap-x-10 gap-y-7'>
-									{/* Entry  */}
+									{/*jail warder Entry  */}
 									<div>
 										<div>
 											<label htmlFor=''>Entry_</label>
 										</div>
 										<input
+											defaultValue={0}
+											name={"jailWarderEntry"}
 											className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold bg-red-200'
-											{...register("userName", {
-												required: true,
-											})}
-											aria-invalid={
-												errors.userName
-													? "true"
-													: "false"
-											}
 										/>
-										{errors.userName?.type ===
-											"required" && (
-											<p
-												role='alert'
-												className='text-[12px] text-red-500'
-											>
-												User name is required
-											</p>
-										)}
 									</div>
 
-									{/* Release  */}
+									{/*jail warder Release  */}
 									<div>
 										<div>
 											<label htmlFor=''>Release_</label>
 										</div>
 										<input
+											defaultValue={0}
+											name={"jailWarderRelease"}
 											className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold bg-green-200'
-											{...register("userEmail", {
-												required: true,
-											})}
-											aria-invalid={
-												errors.userEmail
-													? "true"
-													: "false"
-											}
 										/>
-										{errors.userEmail?.type ===
-											"required" && (
-											<p
-												role='alert'
-												className='text-[12px] text-red-500'
-											>
-												Email is required
-											</p>
-										)}
 									</div>
 								</div>
 							</div>
 							<div>
-								<div>
-									<p>MG Rakib_</p>
-								</div>
+								<div></div>
 								<div className='grid grid-cols-2 gap-x-10 gap-y-7'>
-									{/* Entry  */}
+									{/*active  */}
 									<div>
 										<div>
-											<label htmlFor=''>Entry_</label>
+											<label htmlFor=''>
+												Active Prison_
+											</label>
 										</div>
 										<input
+											defaultValue={0}
+											name={"activePrison"}
 											className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold bg-red-200'
-											{...register("userName", {
-												required: true,
-											})}
-											aria-invalid={
-												errors.userName
-													? "true"
-													: "false"
-											}
 										/>
-										{errors.userName?.type ===
-											"required" && (
-											<p
-												role='alert'
-												className='text-[12px] text-red-500'
-											>
-												User name is required
-											</p>
-										)}
 									</div>
 
-									{/* Release  */}
+									{/*jail warder Release  */}
 									<div>
 										<div>
-											<label htmlFor=''>Release_</label>
+											<label htmlFor=''>
+												Lockup Prison_
+											</label>
 										</div>
 										<input
+											defaultValue={0}
+											name={"lockupPrison"}
 											className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold bg-green-200'
-											{...register("userEmail", {
-												required: true,
-											})}
-											aria-invalid={
-												errors.userEmail
-													? "true"
-													: "false"
-											}
 										/>
-										{errors.userEmail?.type ===
-											"required" && (
-											<p
-												role='alert'
-												className='text-[12px] text-red-500'
-											>
-												Email is required
-											</p>
-										)}
-									</div>
-								</div>
-							</div>
-							<div>
-								<div>
-									<p>MG Rakib_</p>
-								</div>
-								<div className='grid grid-cols-2 gap-x-10 gap-y-7'>
-									{/* Entry  */}
-									<div>
-										<div>
-											<label htmlFor=''>Entry_</label>
-										</div>
-										<input
-											className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold bg-red-200'
-											{...register("userName", {
-												required: true,
-											})}
-											aria-invalid={
-												errors.userName
-													? "true"
-													: "false"
-											}
-										/>
-										{errors.userName?.type ===
-											"required" && (
-											<p
-												role='alert'
-												className='text-[12px] text-red-500'
-											>
-												User name is required
-											</p>
-										)}
-									</div>
-
-									{/* Release  */}
-									<div>
-										<div>
-											<label htmlFor=''>Release_</label>
-										</div>
-										<input
-											className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold bg-green-200'
-											{...register("userEmail", {
-												required: true,
-											})}
-											aria-invalid={
-												errors.userEmail
-													? "true"
-													: "false"
-											}
-										/>
-										{errors.userEmail?.type ===
-											"required" && (
-											<p
-												role='alert'
-												className='text-[12px] text-red-500'
-											>
-												Email is required
-											</p>
-										)}
-									</div>
-								</div>
-							</div>
-							<div>
-								<div>
-									<p>MG Rakib_</p>
-								</div>
-								<div className='grid grid-cols-2 gap-x-10 gap-y-7'>
-									{/* Entry  */}
-									<div>
-										<div>
-											<label htmlFor=''>Entry_</label>
-										</div>
-										<input
-											className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold bg-red-200'
-											{...register("userName", {
-												required: true,
-											})}
-											aria-invalid={
-												errors.userName
-													? "true"
-													: "false"
-											}
-										/>
-										{errors.userName?.type ===
-											"required" && (
-											<p
-												role='alert'
-												className='text-[12px] text-red-500'
-											>
-												User name is required
-											</p>
-										)}
-									</div>
-
-									{/* Release  */}
-									<div>
-										<div>
-											<label htmlFor=''>Release_</label>
-										</div>
-										<input
-											className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold bg-green-200'
-											{...register("userEmail", {
-												required: true,
-											})}
-											aria-invalid={
-												errors.userEmail
-													? "true"
-													: "false"
-											}
-										/>
-										{errors.userEmail?.type ===
-											"required" && (
-											<p
-												role='alert'
-												className='text-[12px] text-red-500'
-											>
-												Email is required
-											</p>
-										)}
 									</div>
 								</div>
 							</div>
@@ -310,7 +221,7 @@ const UpdateDate = () => {
 
 						<div>
 							<Button
-								disabled={createUserIsLoading}
+								// disabled={false}
 								type='submit'
 								className='w-full py-2 bg-[#3498DB] mt-5 text-white'
 							>
@@ -321,7 +232,7 @@ const UpdateDate = () => {
 				</div>
 			</div>
 
-			<GlobalLoading isOpen={createUserIsLoading} />
+			<GlobalLoading isOpen={false} />
 		</div>
 	);
 };

@@ -17,7 +17,8 @@ export const dailyReportAPI = createApi({
 			}),
 		}),
 
-		getSingleUser: builder.query({ //TODO: manage cash when transfer but don't change data when retype 
+		getSingleUser: builder.query({
+			//TODO: manage cash when transfer but don't change data when retype
 			query: ({ key, value }) => ({
 				url: `/u/user?key=${key}&value=${value}`,
 			}),
@@ -29,6 +30,18 @@ export const dailyReportAPI = createApi({
 			}),
 			invalidates: [{ endpoint: "getSingleUser", args: { key: "s_i" } }],
 		}),
+		getWorkStationOpe: builder.query({
+			query: stationName => ({
+				url: `/r/workstation-ope?s_n=${stationName}`,
+			}),
+		}),
+		submitDailyReport: builder.mutation({
+			query: ([...report]) => ({
+				url: `/r/update-report`,
+				method: "POST",
+				body: report,
+			}),
+		}),
 	}),
 });
 
@@ -36,4 +49,6 @@ export const {
 	useCreateNewUserMutation,
 	useGetSingleUserQuery,
 	useTransferUserMutation,
+	useGetWorkStationOpeQuery,
+	useSubmitDailyReportMutation
 } = dailyReportAPI;
