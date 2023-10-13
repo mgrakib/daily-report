@@ -23,6 +23,12 @@ export const dailyReportAPI = createApi({
 				url: `/u/user?key=${key}&value=${value}`,
 			}),
 		}),
+		getUserPreviousHistory: builder.query({
+			//TODO: manage cash when transfer but don't change data when retype
+			query: ( value) => ({
+				url: `/u/user/h?value=${value}`,
+			}),
+		}),
 		transferUser: builder.mutation({
 			query: ({ s_i, new_s }) => ({
 				url: `/u/user?s_i=${s_i}&new_s=${new_s}`,
@@ -56,5 +62,6 @@ export const {
 	useTransferUserMutation,
 	useGetWorkStationOpeQuery,
 	useSubmitDailyReportMutation,
-	useGetTodayReportForStationQuery
+	useGetTodayReportForStationQuery,
+	useGetUserPreviousHistoryQuery
 } = dailyReportAPI;
