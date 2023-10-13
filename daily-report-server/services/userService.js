@@ -53,7 +53,7 @@ const transferUserService = async (userServiceID, newStationName) => {
 	const updateWorkStationHistory =
 		await UserPreviousWorkStationHistory.findOneAndUpdate(
 			{
-				userID: user._id,
+				userServiceID: user.userServiceID,
 			},
 			{
 				$push: {

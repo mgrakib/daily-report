@@ -1,10 +1,7 @@
 const {Schema, model} = require('mongoose')
 
 const userPreviousWork_s_historySchema = new Schema({
-	userID: {
-		type: Schema.Types.ObjectId,
-		ref: "User",
-	},
+	userServiceID: String,
 	workStationHistory: [
 		{
 			stationName: {
