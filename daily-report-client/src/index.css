@@ -64,3 +64,13 @@ p, h1, h2, h3, h4, h5, h6 {
     transform: translateY(0%);
   }
 }
+
+
+::-webkit-scrollbar{
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb{
+  background-color: var(--dark-primary-color);
+  border-radius: 10px;
+}

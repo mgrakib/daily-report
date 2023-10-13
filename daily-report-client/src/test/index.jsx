@@ -1,8 +1,9 @@
-import data from '../../public/prison_list.json'
+/** @format */
+
+import data from "../../public/prison_list.json";
 
 const TESt = () => {
-    
-    const mapArr = Object.keys(data)
+	const mapArr = Object.keys(data)
 		.map(item => {
 			if (item.startsWith("1015")) {
 				return data[item];
@@ -10,13 +11,7 @@ const TESt = () => {
 		})
 		.filter(Boolean);
 
-    
-
-    return (
-        <div>
-            
-        </div>
-    );
+	return <div></div>;
 };
 
 export default TESt;

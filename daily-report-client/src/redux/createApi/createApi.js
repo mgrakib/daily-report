@@ -42,6 +42,11 @@ export const dailyReportAPI = createApi({
 				body: report,
 			}),
 		}),
+		getTodayReportForStation: builder.query({
+			query: stationName => ({
+				url: `/r/update-info?s_n=${stationName}`,
+			}),
+		}),
 	}),
 });
 
@@ -50,5 +55,6 @@ export const {
 	useGetSingleUserQuery,
 	useTransferUserMutation,
 	useGetWorkStationOpeQuery,
-	useSubmitDailyReportMutation
+	useSubmitDailyReportMutation,
+	useGetTodayReportForStationQuery
 } = dailyReportAPI;

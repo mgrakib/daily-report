@@ -6,7 +6,11 @@ import { changeNavState } from "../../redux/features/nav-value-state/navValueSli
 import { useForm } from "react-hook-form";
 import { Button, Radio } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useGetWorkStationOpeQuery, useSubmitDailyReportMutation } from "../../redux/createApi/createApi";
+import {
+	useGetTodayReportForStationQuery,
+	useGetWorkStationOpeQuery,
+	useSubmitDailyReportMutation,
+} from "../../redux/createApi/createApi";
 import GlobalLoading from "../../Shared/global-loading/global-loading";
 import { format } from "date-fns";
 
@@ -16,14 +20,20 @@ const UpdateDate = () => {
 	const dispatch = useDispatch();
 	useChangeNavStatus(dispatch, changeNavState, true, "UPDATE DATA");
 
-	const [state, setState] = useState([]); // state for value 
+	const [state, setState] = useState([]); // state for value
 
+	const {
+		data: stationUpdateReport,
+		isLoading: stationUpdateReportIsLoading,
+	} = useGetTodayReportForStationQuery(station);
 	const { data: workStationOpe, isLoading: getOperatorsIsLoading } =
 		useGetWorkStationOpeQuery(station); // TODO: change the statation name dynamcit
 
+	const [
+		updateReport,
+		{ data: updateReportInfo, isLoading: updateReportIsLoading },
+	] = useSubmitDailyReportMutation();
 
-	const [updateReport, { data: updateReportInfo, isLoading:updateReportIsLoading }] = useSubmitDailyReportMutation()
-	
 	useEffect(() => {
 		if (state.length === 0) {
 			//set state value
@@ -53,22 +63,39 @@ const UpdateDate = () => {
 		});
 	};
 
-	console.log(updateReportInfo, updateReportIsLoading);
+	const isTodaysUpdateDone = stationUpdateReport?.isTodaysUpdateDone;
 
-	
+	console.log(stationUpdateReport);
+
 	const onSubmit = e => {
 		e.preventDefault();
+		if (isTodaysUpdateDone) {
+			alert(`Your Today's Submition is done do you update previous data`);
+		}
+
+		alert(`he want topr...`);
 		const jailWarderEntry = e.target.jailWarderEntry.value;
 		const jailWarderRelease = e.target.jailWarderRelease.value;
-		const newValue = [...state]
-		newValue.push({
-			userServiceID: `jailWarder|${station}`,
-			entry: jailWarderEntry,
-			release: jailWarderRelease,
-		});
+		const activePrison = e.target.activePrison.value;
+		const lockupPrison = e.target.lockupPrison.value;
+		const value = [
+			{
+				userServiceID: `jailWarder${station.slice(0, 3)}|${station}`,
+				entry: jailWarderEntry,
+				release: jailWarderRelease,
+			},
+			{
+				activePrison,
+				lockupPrison,
+				stationName: station,
+				authorId:"1011"
+			},
+		];
 
-		updateReport(newValue);
+		const newValue = [...state];
+		newValue.push(...value);
 
+		updateReport(newValue).then().catch().finally();
 	};
 	return (
 		<div
@@ -94,8 +121,16 @@ const UpdateDate = () => {
 								{format(new Date(), "yyyy-MM-dd")}
 							</h3>
 
-							<div className="text-[14px] py-[2px] px-[4px] bg-red-100 text-dashboard-color rounded-sm">
-								Update Incomplete
+							<div
+								className={`text-[14px] py-[2px] px-[4px] ${
+									isTodaysUpdateDone
+										? "bg-green-400"
+										: "bg-red-300"
+								} text-dashboard-color rounded-sm`}
+							>
+								{isTodaysUpdateDone
+									? "Update Completed"
+									: "Update Incomplete"}
 							</div>
 						</div>
 					</div>
@@ -221,7 +256,7 @@ const UpdateDate = () => {
 
 						<div>
 							<Button
-								// disabled={false}
+								disabled={updateReportIsLoading}
 								type='submit'
 								className='w-full py-2 bg-[#3498DB] mt-5 text-white'
 							>
@@ -232,7 +267,7 @@ const UpdateDate = () => {
 				</div>
 			</div>
 
-			<GlobalLoading isOpen={false} />
+			<GlobalLoading isOpen={updateReportIsLoading} />
 		</div>
 	);
 };
