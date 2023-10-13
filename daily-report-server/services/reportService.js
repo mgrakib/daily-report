@@ -4,6 +4,8 @@ const { format } = require("date-fns");
 const ReportModel = require("../models/reports");
 const WorkStationOpeSchema = require("../models/workstation-info");
 const Active_LockupSchema = require("../models/activeLockup");
+const ReportUpdateHistorySchema = require("../models/reportUpdateHistory");
+const { findDocument } = require("./utils");
 
 const updateReportDocument = async (
 	userServiceID,
@@ -14,14 +16,15 @@ const updateReportDocument = async (
 	const newKey = `${userServiceID}|${newStationName}`;
 
 	const jailWarderHistory = await ReportModel.findOne({
-		[`jailWarder|${newStationName}`]: { $exists: true },
+		[`jailWarder${newStationName.slice(0, 3)}|${newStationName}`]: {
+			$exists: true,
+		},
 	});
 
-
-	if (!jailWarderHistory && newStationName !=="NTMC") {
+	if (!jailWarderHistory && newStationName !== "NTMC") {
 		// add jailWarder
 		const reportData = new ReportModel({
-			[`jailWarder|${newStationName}`]: {
+			[`jailWarder${newStationName.slice(0, 3)}|${newStationName}`]: {
 				[format(new Date(), "yyyy-MM-dd")]: {
 					entry: 0,
 					release: 0,
@@ -90,7 +93,7 @@ const updateEntryRelease = async data => {
 };
 
 const updateActiveLockup = async data => {
-	const { activePrison, lockupPrison, stationName } = data || {};
+	const { activePrison, lockupPrison, stationName, authorId } = data || {};
 	const newDate = format(new Date(), "yyyy-MM-dd");
 	const newValue = await Active_LockupSchema.updateOne(
 		{ [stationName]: { $exists: true } },
@@ -104,10 +107,115 @@ const updateActiveLockup = async data => {
 		},
 		{ upsert: true }
 	);
-}
+
+	const updateHistory = await updateReportWriteHistory(
+		stationName,
+		authorId,
+		newDate
+	);
+};
+
+const getActiveLockupEntryRelease = async data => {
+	const newDate = data?.date ?? format(new Date(), "yyyy-MM-dd");
+	try {
+		const documents = await ReportModel.find(); //find all data
+
+		const result = {}; //empty object to content all arr to object
+
+		documents.forEach(item => {
+			// Check if the item has a key with the desired format
+			const keys = Object.keys(item).filter(key => key.includes("|"));
+
+			if (keys.length > 0) {
+				// Copy the value of the key to the result object
+				result[keys[0]] = item[keys[0]];
+			}
+		});
+
+		const objArr = Object.keys(result).reduce((acc, cur) => {
+			if (cur.endsWith(data)) {
+				Object.keys(result[cur]).forEach(dateKey => {
+					if (newDate === dateKey) {
+						acc[cur] = result[cur][dateKey];
+					}
+				});
+			}
+			return acc;
+		}, {});
+
+		const activeLockup = await findDocument(Active_LockupSchema, data); //find active
+		const activeObj = Object.keys(activeLockup).reduce((acc, cur) => {
+			if (cur === data) {
+				Object.keys(activeLockup[cur]).forEach(dateKey => {
+					if (newDate === dateKey) {
+						acc[cur] = activeLockup[cur][dateKey];
+					}
+				});
+			}
+			return acc;
+		}, {});
+
+		return {
+			opeReport: objArr,
+			activeLockup: activeObj,
+			isTodaysUpdateDone:
+				Object.keys(activeObj).length === 0 ? false : true,
+		};
+	} catch (error) {
+		console.error("Error:", error);
+	}
+};
+
+const updateReportWriteHistory = async (stationName, authorId, newDate) => {
+	let existingRecord = await ReportUpdateHistorySchema.findOne({
+		[stationName]: { $exists: true },
+	});
+
+	if (!existingRecord) {
+		// If the record doesn't exist, create a new one
+		existingRecord = new ReportUpdateHistorySchema();
+		existingRecord[stationName] = {
+			[newDate]: [
+				{
+					authorId,
+					dateTime: new Date(),
+				},
+			],
+		};
+	} else if (!existingRecord[stationName][newDate]) {
+		// If 'newDate' doesn't exist, create a new entry
+		existingRecord[stationName][newDate] = [
+			{
+				authorId,
+				dateTime: new Date(),
+			},
+		];
+	} else {
+		// If 'newDate' already exists, push a new object into the array
+		existingRecord[stationName][newDate].push({
+			authorId,
+			dateTime: new Date(),
+		});
+	}
+
+	// Update the existing record in the database
+	const updatedRecord = await ReportUpdateHistorySchema.findOneAndUpdate(
+		{ _id: existingRecord._id },
+		existingRecord,
+		{ new: true }
+	);
+
+	// The 'updatedRecord' now contains the latest changes
+
+	// If you want to use the updated record, you can return it or perform further operations.
+	return updatedRecord;
+};
+
 module.exports = {
 	updateReportDocument,
 	updateEntryRelease,
 	getWorkStationOpe,
 	updateActiveLockup,
+	getActiveLockupEntryRelease,
+	updateReportWriteHistory,
 };
