@@ -5,7 +5,11 @@ const ReportModel = require("../models/reports");
 const WorkStationOpeSchema = require("../models/workstation-info");
 const Active_LockupSchema = require("../models/activeLockup");
 const ReportUpdateHistorySchema = require("../models/reportUpdateHistory");
+const UserNameWithID = require("../models/userNameWithID");
 const { findDocument } = require("./utils");
+const {
+	countDocuments,
+} = require("../models/user-previouse-worstation-history");
 
 const updateReportDocument = async (
 	userServiceID,
@@ -121,13 +125,15 @@ const getActiveLockupEntryRelease = async (
 	userServiceID,
 	numDays
 ) => {
-	console.log(stationName, reportDate, userServiceID, numDays , ' lajsflsfd');
 	const newDateD = reportDate || format(new Date(), "yyyy-MM-dd"); //this date just formate
-	const daysCount = numDays || 30
-	
+	const daysCount = numDays || 30;
+
 	try {
 		// If reportDate is not provided or is in an incorrect format, default to today
-		const newDate = reportDate ? new Date(reportDate) : new Date(); //this date make with time sec
+
+		const newDate = reportDate
+			? new Date(reportDate)
+			: new Date(format(new Date(), "yyyy-MM-dd")); //this date make with time sec
 
 		const documents = await ReportModel.find(); // Find all data
 
@@ -153,7 +159,7 @@ const getActiveLockupEntryRelease = async (
 			) {
 				const dates = Object.keys(result[cur]);
 				const daysBefore = new Date(
-					newDate - daysCount * 24 * 60 * 60 * 1000
+					newDate.getTime() - daysCount * 24 * 60 * 60 * 1000
 				);
 
 				const filteredDates = dates.filter(dateKey => {
@@ -173,30 +179,57 @@ const getActiveLockupEntryRelease = async (
 			return acc;
 		}, {});
 
-		
-
 		const activeLockup = await findDocument(
 			Active_LockupSchema,
-			stationName
+			stationName === "All" ? null : stationName
 		); //find active
 
-		const activeObj = Object.keys(activeLockup)?.reduce((acc, cur) => {
-			if (cur === stationName) {
-				Object.keys(activeLockup[cur]).forEach(dateKey => {
-					if (newDateD === dateKey) {
-						acc[cur] = activeLockup[cur][dateKey];
+		
+		let activeObj;
+		if (stationName === "All") {
+			const extractedData = {};
+			activeLockup.forEach(document => {
+				for (const prisonName in document) {
+					const prisonData = document[prisonName];
+					if (
+						typeof prisonData === "object" &&
+						!Array.isArray(prisonData)
+					) {
+						const dataForDate = prisonData[newDateD];
+						if (dataForDate) {
+							extractedData[prisonName] = {
+								activePrison: dataForDate.activePrison,
+								lockupPrison: dataForDate.lockupPrison,
+							};
+						}
 					}
-				});
-			}
-			return acc;
-		}, {});
+				}
+			});
 
-		console.log(activeObj,  activeLockup , 'lkjaslfkjsf ');
+			activeObj = extractedData
+		} else {
+			activeObj = Object.keys(activeLockup)?.reduce((acc, cur) => {
+				if (cur === stationName) {
+					Object.keys(activeLockup[cur]).forEach(dateKey => {
+						if (newDateD === dateKey) {
+							acc[cur] = activeLockup[cur][dateKey];
+						}
+					});
+				}
+				return acc;
+			}, {});
+		}
+
+		const usersNameWithID = await UserNameWithID.find();
+
 		return {
 			opeReport: objArr,
 			activeLockup: activeObj,
+			usersNameWithID,
 			isTodaysUpdateDone:
-				Object.keys(activeObj).length === 0 ? false : true,
+				stationName !== "All" && Object.keys(activeObj).length === 0
+					? false
+					: true,
 		};
 	} catch (error) {
 		console.error("Error:", error);
@@ -209,9 +242,9 @@ const updateReportWriteHistory = async (stationName, authorId, newDate) => {
 		[stationName]: { $exists: true },
 	});
 
-	console.log(existingRecord, " this is before");
+	
 	if (!existingRecord) {
-		console.log("nai kichu nai");
+		
 		// If the record doesn't exist, create a new one
 		existingRecord = new ReportUpdateHistorySchema({
 			[stationName]: {
@@ -224,7 +257,7 @@ const updateReportWriteHistory = async (stationName, authorId, newDate) => {
 			},
 		});
 
-		await existingRecord.save()
+		await existingRecord.save();
 	} else if (!existingRecord[stationName][newDate]) {
 		// If 'newDate' doesn't exist, create a new entry
 		existingRecord[stationName][newDate] = [
@@ -238,7 +271,7 @@ const updateReportWriteHistory = async (stationName, authorId, newDate) => {
 		existingRecord[stationName][newDate].push({
 			authorId,
 			dateTime: new Date(),
-		}); 
+		});
 	}
 
 	// // Update the existing record in the database

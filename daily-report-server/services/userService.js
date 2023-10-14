@@ -1,6 +1,7 @@
 /** @format */
 const { format } = require("date-fns");
 const Users = require("../models/user"); //model
+const UserNameWithID = require("../models/userNameWithID"); //model
 const UserPreviousWorkStationHistory = require("../models/user-previouse-worstation-history"); //model
 
 const { updateReportDocument } = require("./reportService"); //report service
@@ -32,7 +33,10 @@ const createNewUser = async (
 		password: hashPassword,
 	});
 	await user.save();
-
+	const saveUserNameWithID = new UserNameWithID({
+		[userServiceID]: userName,
+	});
+	await saveUserNameWithID.save()
 	return user;
 };
 
