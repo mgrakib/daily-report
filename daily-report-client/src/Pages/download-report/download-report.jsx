@@ -59,16 +59,21 @@ const DownloadReport = () => {
 		stationName: state.stationName,
 		reportDate: state.reportDate,
 		userServiceID: state.userServiceID,
-		numDays: 5
+		numDays: 5 //TODO: make it dyanamci
 	});
 
-	console.log(
-		stationUpdateReport,
-		" user daosdfj",
-		state.stationName,
-		state.reportDate,
-		state.userServiceID
-	);
+	
+	const usersName = stationUpdateReport?.usersNameWithID.reduce((acc, cru) => {
+		for (let id in cru) {
+			if (!id.startsWith("_")) {
+				acc[id] = cru[id]
+			}
+		}
+		return acc
+	}, {})
+
+	console.log(stationUpdateReport);
+	
 	const handelChange = e => {
 		const { name, value } = e.target;
 		setState(pre => ({
@@ -109,7 +114,7 @@ const DownloadReport = () => {
 			}}
 			className='text-dark-common-color h-full '
 		>
-			<div className='w-full h-full bg-[#000000eb]  p-10 '>
+			<div className='w-full h-screen overflow-y-auto  bg-[#000000eb]  p-10 '>
 				<div className='shadow-[0_0_20px_10px_#ffffff01] p-5 rounded-md bg-[#8a8a8a22] max-w-2xl mx-auto'>
 					<h3 className='text-2xl font-semibold '>
 						Download Report_
@@ -333,7 +338,12 @@ const DownloadReport = () => {
 						</div>
 					</form>
 				</div>
-				<PDFPage data={stationUpdateReport?.opeReport ?? {}} />
+				<PDFPage
+					usersName={usersName ?? {}}
+					data={stationUpdateReport?.opeReport ?? {}}
+					activeLockup={stationUpdateReport?.activeLockup ?? {}}
+					reportDate={state.reportDate}
+				/>
 			</div>
 
 			<GlobalLoading isOpen={false} />
