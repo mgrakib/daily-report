@@ -15,6 +15,8 @@ const UserHistory = () => {
 	const adminParam = queryParams.get("admin");
 	const s_iParam = queryParams.get("s_i");
 
+	console.log(adminParam, s_iParam);
+
 	//change automatically nav name and state
 	const dispatch = useDispatch();
 	useChangeNavStatus(dispatch, changeNavState, true, "USER HISTORY");
@@ -29,7 +31,7 @@ const UserHistory = () => {
 
 	const { data: singleUser, isLoading } = useGetSingleUserQuery({
 		key: "userServiceID",
-		value: watch("userServiceID"),
+		value: s_iParam ?? watch("userServiceID"),
 	}); // api request for track user on service id
 
 
@@ -48,12 +50,13 @@ const UserHistory = () => {
 					"url(https://i.ibb.co/SVRN9jZ/technology.webp)",
 				backgroundSize: "cover",
 			}}
+			className="h-full"
 		>
-			<div className='w-full h-full bg-[#000000eb]  '>
+			<div className='w-full min-h-full bg-[#000000eb]  '>
 				<div className='text-dark-common-color p-10 max-w-5xl mx-auto '>
 					<div className={`grid grid-cols-3 gap-x-10 gap-y-7`}>
 						{/* user Email  */}
-						<form className='font-light mt-7 '>
+						{adminParam && <form className='font-light mt-7 '>
 							<div>
 								<div>
 									<label htmlFor=''>Service ID_</label>
@@ -75,7 +78,7 @@ const UserHistory = () => {
 									/>
 								</Tooltip>
 							</div>
-						</form>
+						</form>}
 					</div>
 
 					<div className='mt-10'>

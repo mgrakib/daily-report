@@ -8,34 +8,65 @@ import { useForm } from "react-hook-form";
 
 import { Button, Checkbox, Radio, Tooltip } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useCreateNewUserMutation } from "../../redux/createApi/createApi";
+import {
+	useCreateNewUserMutation,
+	useGetSingleUserQuery,
+	useGetTodayReportQuery,
+} from "../../redux/createApi/createApi";
 import GlobalLoading from "../../Shared/global-loading/global-loading";
 
 const STATE_INIT = {
 	allStationNameDisable: true,
 	individualReportCollops: true,
-	stationName: "",
-	reportDate: "",
-	userServiceID: "",
+	stationName: null,
+	reportDate: null,
+	userServiceID: null,
 };
 const DownloadReport = () => {
 	const [state, setState] = useState({ ...STATE_INIT });
+	const [targetUser, setTargetUser] = useState(null); //this value will display at the disabled field
+
 	//change automatically nav name and state
 	const dispatch = useDispatch();
 	useChangeNavStatus(dispatch, changeNavState, true, "DOWNLOAD REPORT");
+	const {
+		register,
+		handleSubmit,
+		watch,
+		reset,
+		formState: { errors },
+	} = useForm(); //form attribute
+
+	const { data: singleUser, isLoading } = useGetSingleUserQuery({
+		key: "userServiceID",
+		value: state.userServiceID,
+	}); // api request for track user on service id
+
+	useEffect(() => {
+		//load target user value to display disable filed
+		setTargetUser(singleUser?.user);
+	}, [singleUser]);
 
 	const { isOpen, stationsName } = useSelector(
 		state => state.workStationList
 	); //get stations name
 
-	const [selectedGender, setSelectedGender] = useState("male");
-	const handleChange = event => {
-		setSelectedGender(event.target.value);
-	};
+	const {
+		data: stationUpdateReport,
+		isLoading: stationUpdateReportIsLoading,
+	} = useGetTodayReportQuery({
+		stationName: state.stationName,
+		reportDate: state.reportDate,
+		userServiceID: state.userServiceID,
+	});
 
-	const [createUser, { data: createdUser, isLoading: createUserIsLoading }] =
-		useCreateNewUserMutation();
-
+	console.log(
+		stationUpdateReport,
+		" user daosdfj",
+		state.stationName,
+		state.reportDate,
+		state.userServiceID
+	);
 	const handelChange = e => {
 		const { name, value } = e.target;
 		setState(pre => ({
@@ -43,20 +74,20 @@ const DownloadReport = () => {
 			[name]: value,
 		}));
 	};
-	
+
 	const handelSubmit = e => {
 		e.preventDefault();
-		console.log( state);
+		console.log(state);
 	};
 
-	
 	useEffect(() => {
+		// section collops or not
 		if (state.individualReportCollops) {
 			setState(pre => ({
 				...pre,
-				stationName: "All Station",
-				userServiceID: '',
-				reportDate:''
+				stationName: "All",
+				userServiceID: "",
+				reportDate: "",
 			}));
 		} else if (!state.individualReportCollops) {
 			setState(pre => ({
@@ -67,7 +98,6 @@ const DownloadReport = () => {
 		}
 	}, [state.individualReportCollops]);
 
-	const targetUser = {}; // have to change it
 	return (
 		<div
 			style={{
@@ -114,14 +144,17 @@ const DownloadReport = () => {
 											className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold'
 										>
 											<option
-												value={"All Station"}
-												className='hidden'
+												value={"All"}
+												
 											>
 												All Station_
 											</option>
 
 											{stationsName.map(stationName => (
 												<option
+													disabled={
+														stationName === "NTMC"
+													}
 													value={stationName}
 													key={stationName}
 												>
@@ -292,7 +325,7 @@ const DownloadReport = () => {
 
 						<div>
 							<Button
-								disabled={createUserIsLoading}
+								disabled={false}
 								type='submit'
 								className='w-full py-2 bg-[#3498DB] mt-5 text-white'
 							>
@@ -303,7 +336,7 @@ const DownloadReport = () => {
 				</div>
 			</div>
 
-			<GlobalLoading isOpen={createUserIsLoading} />
+			<GlobalLoading isOpen={false} />
 		</div>
 	);
 };

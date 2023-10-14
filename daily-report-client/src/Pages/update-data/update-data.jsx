@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { Button, Radio } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
-	useGetTodayReportForStationQuery,
+	useGetTodayReportQuery,
 	useGetWorkStationOpeQuery,
 	useSubmitDailyReportMutation,
 } from "../../redux/createApi/createApi";
@@ -25,7 +25,7 @@ const UpdateDate = () => {
 	const {
 		data: stationUpdateReport,
 		isLoading: stationUpdateReportIsLoading,
-	} = useGetTodayReportForStationQuery(station);
+	} = useGetTodayReportQuery(station);
 	const { data: workStationOpe, isLoading: getOperatorsIsLoading } =
 		useGetWorkStationOpeQuery(station); // TODO: change the statation name dynamcit
 
@@ -112,7 +112,8 @@ const UpdateDate = () => {
 						<h3 className=' '>
 							Work Update of <br />
 							<span className='text-2xl font-semibold'>
-								Narayangang District Jail_
+								{/* TODO: dynamic */}
+								{station}_ 
 							</span>
 						</h3>
 

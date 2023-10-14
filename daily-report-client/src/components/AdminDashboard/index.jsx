@@ -35,7 +35,7 @@ const NAV_ITEM_INTI = [
 		title: "USER HISTORY",
 		buttonTitle: "Update",
 		icon: "arrows-rotate",
-		link: "/dashboard/user-history?admin=true&s_i=12",
+		link: "/dashboard/user-profile?admin=true",
 		id: "adminNav#5",
 	},
 ];

@@ -37,7 +37,7 @@ const router = createBrowserRouter([
 				element: <UpdateDate />,
 			},
 			{
-				path: "/dashboard/user-history",
+				path: "/dashboard/user-profile",
 				element: <UserHistory />,
 			},
 		],

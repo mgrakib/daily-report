@@ -11,10 +11,10 @@ const NAV_ITEM_INTI = [
 		id: "adminNav#1",
 	},
 	{
-		title: "USER HISTORY",
-		buttonTitle: "View History",
+		title: "My Profile",
+		buttonTitle: "View Profile",
 		icon: "arrows-rotate",
-		link: "/dashboard/user-history?s_i=12",
+		link: "/dashboard/user-profile?s_i=1010",
 		id: "adminNav#2",
 	},
 ];
