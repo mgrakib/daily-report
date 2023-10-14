@@ -15,7 +15,7 @@ import GlobalLoading from "../../Shared/global-loading/global-loading";
 import { format } from "date-fns";
 
 const UpdateDate = () => {
-	const station = "Cox's Bazar District Jail";
+	const station = "Bagerhat District Jail";
 	//change automatically nav name and state
 	const dispatch = useDispatch();
 	useChangeNavStatus(dispatch, changeNavState, true, "UPDATE DATA");
@@ -25,7 +25,11 @@ const UpdateDate = () => {
 	const {
 		data: stationUpdateReport,
 		isLoading: stationUpdateReportIsLoading,
-	} = useGetTodayReportQuery(station);
+	} = useGetTodayReportQuery({
+		stationName: "Dhaka Central Jail",
+		reportDate: "",
+		userServiceID: "",
+	});
 	const { data: workStationOpe, isLoading: getOperatorsIsLoading } =
 		useGetWorkStationOpeQuery(station); // TODO: change the statation name dynamcit
 
@@ -65,7 +69,7 @@ const UpdateDate = () => {
 
 	const isTodaysUpdateDone = stationUpdateReport?.isTodaysUpdateDone;
 
-	console.log(stationUpdateReport);
+	
 
 	const onSubmit = e => {
 		e.preventDefault();
@@ -88,7 +92,7 @@ const UpdateDate = () => {
 				activePrison,
 				lockupPrison,
 				stationName: station,
-				authorId:"1011"
+				authorId:"1013" //TODO:Change the authr name aynamic 
 			},
 		];
 
@@ -97,6 +101,9 @@ const UpdateDate = () => {
 
 		updateReport(newValue).then().catch().finally();
 	};
+
+
+	console.log(stationUpdateReport, ' thoasf');
 	return (
 		<div
 			style={{

@@ -14,6 +14,7 @@ import {
 	useGetTodayReportQuery,
 } from "../../redux/createApi/createApi";
 import GlobalLoading from "../../Shared/global-loading/global-loading";
+import PDFPage from "./pdf-page";
 
 const STATE_INIT = {
 	allStationNameDisable: true,
@@ -143,10 +144,7 @@ const DownloadReport = () => {
 											}
 											className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold'
 										>
-											<option
-												value={"All"}
-												
-											>
+											<option value={"All"}>
 												All Station_
 											</option>
 
@@ -336,6 +334,7 @@ const DownloadReport = () => {
 				</div>
 			</div>
 
+			<PDFPage data={stationUpdateReport?.opeReport ?? {}} />
 			<GlobalLoading isOpen={false} />
 		</div>
 	);
