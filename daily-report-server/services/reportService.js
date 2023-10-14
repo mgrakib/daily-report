@@ -115,7 +115,6 @@ const updateActiveLockup = async data => {
 	);
 };
 
-
 const getActiveLockupEntryRelease = async (
 	stationName,
 	reportDate,
@@ -184,21 +183,27 @@ const getActiveLockupEntryRelease = async (
 };
 
 const updateReportWriteHistory = async (stationName, authorId, newDate) => {
+	console.log(stationName, authorId, newDate, " update ");
 	let existingRecord = await ReportUpdateHistorySchema.findOne({
 		[stationName]: { $exists: true },
 	});
 
+	console.log(existingRecord, " this is before");
 	if (!existingRecord) {
+		console.log("nai kichu nai");
 		// If the record doesn't exist, create a new one
-		existingRecord = new ReportUpdateHistorySchema();
-		existingRecord[stationName] = {
-			[newDate]: [
-				{
-					authorId,
-					dateTime: new Date(),
-				},
-			],
-		};
+		existingRecord = new ReportUpdateHistorySchema({
+			[stationName]: {
+				[newDate]: [
+					{
+						authorId,
+						dateTime: new Date(),
+					},
+				],
+			},
+		});
+
+		await existingRecord.save()
 	} else if (!existingRecord[stationName][newDate]) {
 		// If 'newDate' doesn't exist, create a new entry
 		existingRecord[stationName][newDate] = [
@@ -215,13 +220,14 @@ const updateReportWriteHistory = async (stationName, authorId, newDate) => {
 		});
 	}
 
-	// Update the existing record in the database
+	// // Update the existing record in the database
 	const updatedRecord = await ReportUpdateHistorySchema.findOneAndUpdate(
 		{ _id: existingRecord._id },
 		existingRecord,
 		{ new: true }
 	);
 
+	console.log(existingRecord, " this is update");
 	// The 'updatedRecord' now contains the latest changes
 
 	// If you want to use the updated record, you can return it or perform further operations.

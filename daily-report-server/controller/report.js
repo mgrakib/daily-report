@@ -47,7 +47,7 @@ const getActiveLockupEntryReleaseController = async (req, res, next) => {
 			" id",
 			" paramcs"
 		);
-		
+
 		const updateInfo = await getActiveLockupEntryRelease(
 			stationName,
 			reportDate,
