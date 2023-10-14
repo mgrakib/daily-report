@@ -1,10 +1,12 @@
 
 const findDocument = async (modelName, fieldName, value) => {
     
-    if (!value) {
-       return await modelName.findOne({
+    if (!value) { // fled name is dynamic 
+       const obj =  await modelName.findOne({
 			[fieldName]: { $exists: true },
-		});
+	   });
+		
+		return obj ?? {}
     }
 };
 

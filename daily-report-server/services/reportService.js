@@ -115,8 +115,13 @@ const updateActiveLockup = async data => {
 	);
 };
 
-const getActiveLockupEntryRelease = async data => {
-	const newDate = data?.date ?? format(new Date(), "yyyy-MM-dd");
+
+const getActiveLockupEntryRelease = async (
+	stationName,
+	reportDate,
+	userServiceID
+) => {
+	const newDate = reportDate || format(new Date(), "yyyy-MM-dd");
 	try {
 		const documents = await ReportModel.find(); //find all data
 
@@ -133,7 +138,13 @@ const getActiveLockupEntryRelease = async data => {
 		});
 
 		const objArr = Object.keys(result).reduce((acc, cur) => {
-			if (cur.endsWith(data)) {
+			if (
+				userServiceID
+					? cur.startsWith(userServiceID)
+					: stationName === "All"
+					? true
+					: cur.endsWith(stationName)
+			) {
 				Object.keys(result[cur]).forEach(dateKey => {
 					if (newDate === dateKey) {
 						acc[cur] = result[cur][dateKey];
@@ -143,9 +154,15 @@ const getActiveLockupEntryRelease = async data => {
 			return acc;
 		}, {});
 
-		const activeLockup = await findDocument(Active_LockupSchema, data); //find active
-		const activeObj = Object.keys(activeLockup).reduce((acc, cur) => {
-			if (cur === data) {
+		console.log(objArr, " thi is alu");
+
+		const activeLockup = await findDocument(
+			Active_LockupSchema,
+			stationName
+		); //find active
+
+		const activeObj = Object.keys(activeLockup)?.reduce((acc, cur) => {
+			if (cur === stationName) {
 				Object.keys(activeLockup[cur]).forEach(dateKey => {
 					if (newDate === dateKey) {
 						acc[cur] = activeLockup[cur][dateKey];
