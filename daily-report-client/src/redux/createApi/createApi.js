@@ -49,8 +49,8 @@ export const dailyReportAPI = createApi({
 			}),
 		}),
 		getTodayReport: builder.query({
-			query: ({stationName, reportDate, userServiceID}) => ({
-				url: `/r/update-info?s_n=${stationName}&r_d=${reportDate}&u_i=${userServiceID}`,
+			query: ({ stationName, reportDate, userServiceID, numDays }) => ({
+				url: `/r/update-info?s_n=${stationName}&r_d=${reportDate}&u_i=${userServiceID}&n_d=${numDays}`,
 			}),
 		}),
 	}),

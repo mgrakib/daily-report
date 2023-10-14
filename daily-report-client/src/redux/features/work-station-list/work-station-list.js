@@ -71,7 +71,7 @@ const initialState = {
 		"Sunamganj District Jail",
 		"Sylhet Central Jail",
 		"Tangail District Jail",
-		"Thakurgao District Jailn",
+		"Thakurgao District Jail",
 	],
 };
 

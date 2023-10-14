@@ -59,6 +59,7 @@ const DownloadReport = () => {
 		stationName: state.stationName,
 		reportDate: state.reportDate,
 		userServiceID: state.userServiceID,
+		numDays: 5
 	});
 
 	console.log(
@@ -332,9 +333,9 @@ const DownloadReport = () => {
 						</div>
 					</form>
 				</div>
+				<PDFPage data={stationUpdateReport?.opeReport ?? {}} />
 			</div>
 
-			<PDFPage data={stationUpdateReport?.opeReport ?? {}} />
 			<GlobalLoading isOpen={false} />
 		</div>
 	);
