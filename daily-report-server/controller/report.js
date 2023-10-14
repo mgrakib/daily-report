@@ -37,21 +37,12 @@ const getActiveLockupEntryReleaseController = async (req, res, next) => {
 		const stationName = req.query.s_n
 		const reportDate = req.query.r_d;
 		const userServiceID = req.query.u_i
-
-		console.log(
-			reportDate,
-			" data",
-			stationName,
-			" stai",
-			userServiceID,
-			" id",
-			" paramcs"
-		);
-
+		const numDays = req.query.n_d
 		const updateInfo = await getActiveLockupEntryRelease(
 			stationName,
 			reportDate,
-			userServiceID
+			userServiceID,
+			parseInt(numDays)
 		);
 
 		

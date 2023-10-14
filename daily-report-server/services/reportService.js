@@ -118,13 +118,20 @@ const updateActiveLockup = async data => {
 const getActiveLockupEntryRelease = async (
 	stationName,
 	reportDate,
-	userServiceID
+	userServiceID,
+	numDays
 ) => {
-	const newDate = reportDate || format(new Date(), "yyyy-MM-dd");
+	console.log(stationName, reportDate, userServiceID, numDays , ' lajsflsfd');
+	const newDateD = reportDate || format(new Date(), "yyyy-MM-dd"); //this date just formate
+	const daysCount = numDays || 30
+	
 	try {
-		const documents = await ReportModel.find(); //find all data
+		// If reportDate is not provided or is in an incorrect format, default to today
+		const newDate = reportDate ? new Date(reportDate) : new Date(); //this date make with time sec
 
-		const result = {}; //empty object to content all arr to object
+		const documents = await ReportModel.find(); // Find all data
+
+		const result = {}; // Empty object to contain all data as an object
 
 		documents.forEach(item => {
 			// Check if the item has a key with the desired format
@@ -144,16 +151,29 @@ const getActiveLockupEntryRelease = async (
 					? true
 					: cur.endsWith(stationName)
 			) {
-				Object.keys(result[cur]).forEach(dateKey => {
-					if (newDate === dateKey) {
-						acc[cur] = result[cur][dateKey];
-					}
+				const dates = Object.keys(result[cur]);
+				const daysBefore = new Date(
+					newDate - daysCount * 24 * 60 * 60 * 1000
+				);
+
+				const filteredDates = dates.filter(dateKey => {
+					const date = new Date(dateKey);
+					return date >= daysBefore && date <= newDate;
 				});
+
+				const filteredData = {};
+				filteredDates.forEach(dateKey => {
+					filteredData[dateKey] = result[cur][dateKey];
+				});
+
+				if (Object.keys(filteredData).length > 0) {
+					acc[cur] = filteredData;
+				}
 			}
 			return acc;
 		}, {});
 
-		console.log(objArr, " thi is alu");
+		
 
 		const activeLockup = await findDocument(
 			Active_LockupSchema,
@@ -163,7 +183,7 @@ const getActiveLockupEntryRelease = async (
 		const activeObj = Object.keys(activeLockup)?.reduce((acc, cur) => {
 			if (cur === stationName) {
 				Object.keys(activeLockup[cur]).forEach(dateKey => {
-					if (newDate === dateKey) {
+					if (newDateD === dateKey) {
 						acc[cur] = activeLockup[cur][dateKey];
 					}
 				});
@@ -171,6 +191,7 @@ const getActiveLockupEntryRelease = async (
 			return acc;
 		}, {});
 
+		console.log(activeObj,  activeLockup , 'lkjaslfkjsf ');
 		return {
 			opeReport: objArr,
 			activeLockup: activeObj,
@@ -217,7 +238,7 @@ const updateReportWriteHistory = async (stationName, authorId, newDate) => {
 		existingRecord[stationName][newDate].push({
 			authorId,
 			dateTime: new Date(),
-		});
+		}); 
 	}
 
 	// // Update the existing record in the database
