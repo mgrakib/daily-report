@@ -10,16 +10,22 @@ import DownloadReport from "../Pages/download-report/download-report";
 import UserHistory from "../Pages/user-history/user-history";
 import PrivateRouter from "../layout/private-router/private-router";
 
-
-
 const router = createBrowserRouter([
 	{
 		path: "/",
 		element: <SignIN />,
 	},
 	{
+		path: "/create-new-user",
+		element: <CreateNewUser />,
+	},
+	{
 		path: "/dashboard",
-		element: <Dashboard />,
+		element: (
+			<PrivateRouter>
+				<Dashboard />
+			</PrivateRouter>
+		),
 		children: [
 			{
 				path: "/dashboard/create-new-user",
@@ -28,9 +34,9 @@ const router = createBrowserRouter([
 			{
 				path: "/dashboard/transfer-user",
 				element: (
-					<PrivateRouter>
+					
 						<TransferUser />
-					</PrivateRouter>
+					
 				),
 			},
 			{
@@ -40,9 +46,9 @@ const router = createBrowserRouter([
 			{
 				path: "/dashboard/update-data",
 				element: (
-					<PrivateRouter>
+					
 						<UpdateDate />
-					</PrivateRouter>
+					
 				),
 			},
 			{

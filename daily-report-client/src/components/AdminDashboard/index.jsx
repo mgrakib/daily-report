@@ -21,7 +21,7 @@ const NAV_ITEM_INTI = [
 		title: "DOWNLOAD REPORT",
 		buttonTitle: "Download",
 		icon: "file-export",
-		link: "/dashboard/download-report",
+		link: "/dashboard/download-report?isAdmin=true",
 		id: "adminNav#3",
 	},
 	{

@@ -1,7 +1,10 @@
 /** @format */
 
+import { Button } from "@mui/material";
 import { format } from "date-fns";
 import { useState } from "react";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const PDFPage = ({ data, usersName, activeLockup, reportDate }) => {
 	const reportD = reportDate || format(new Date(), "yyyy-MM-dd");
@@ -82,8 +85,33 @@ const PDFPage = ({ data, usersName, activeLockup, reportDate }) => {
 		});
 	});
 
+	const entryRelaseSumAverate = {};
+
+	for (const jail in sortedNewObj) {
+		for (const key in sortedNewObj[jail]) {
+			let totalEntry = 0;
+			let totalRelease = 0;
+			let count = 0; // To count the number of sortedNewObj points
+			for (const date in sortedNewObj[jail][key]) {
+				const values = sortedNewObj[jail][key][date];
+				totalEntry += values.entry;
+				totalRelease += values.release;
+				count++;
+			}
+			const averageEntry = totalEntry / count;
+			const averageRelease = totalRelease / count;
+			entryRelaseSumAverate[key] = {
+				totalEntry,
+				totalRelease,
+				averageEntry,
+				averageRelease,
+			};
+		}
+	}
 	return (
 		<div className='mt-5'>
+			<Button onClick={() => downloadPDF(sortedNewObj)}>Download</Button>
+
 			{Object.keys(sortedNewObj).map((value, i) => {
 				const stationKeys = Object.keys(sortedNewObj[value]);
 				const jailWarderItems = [];
@@ -98,15 +126,12 @@ const PDFPage = ({ data, usersName, activeLockup, reportDate }) => {
 				});
 
 				const allItems = otherItems.concat(jailWarderItems);
-				console.log();
+
 				return (
 					<div key={value}>
-						<div className='text-[15px] text-black bg-[#34A853] px-1 font-bold py-1'>
+						<div className='text-[15px] text-black bg-[#34A853] px-1 font-bold '>
+							{/* station  */}
 							{`(${i + 1}) ${value}`}{" "}
-							<span className='mx-2'>
-								{" Pri-"}
-								{activeLockup?.[value]?.lockupPrison ?? 0}
-							</span>
 							<span className='mx-2'>
 								{" Entry-"}
 								{totalEntryRelease?.[value]?.totalEntry}
@@ -121,21 +146,33 @@ const PDFPage = ({ data, usersName, activeLockup, reportDate }) => {
 							</span>
 						</div>
 						{allItems.map(operator => {
-							// console.log(
-							// 	activeLockup[operator.split("|")[1]],
-							// 	" this iis "
-							// );
+							console.log(JSON.stringify(entryRelaseSumAverate[operator]));
 							return (
 								//    the
 								<div key={operator}>
-									<div className='text-[15px] text-white  px-2 font-bold mt-2'>
-										{operator.startsWith("jailWarder")
-											? "Jail Warder"
-											: usersName[operator.split("|")[0]]}
-									</div>
 									<div className='px-3'>
 										<div className='flex items-center '>
-											<div className='mr-2'>Entry:</div>
+											<span>
+												(
+												{String.fromCharCode(
+													97 +
+														allItems.indexOf(
+															operator
+														)
+												)}
+												){" "}
+												{operator.startsWith(
+													"jailWarder"
+												)
+													? "Jail Warder"
+													: usersName[
+															operator.split(
+																"|"
+															)[0]
+													  ]}{" "}
+												{`: Total Entry-  
+													${entryRelaseSumAverate[operator].totalEntry} (`}
+											</span>
 											{Object.keys(
 												sortedNewObj[value][operator]
 											)
@@ -150,7 +187,7 @@ const PDFPage = ({ data, usersName, activeLockup, reportDate }) => {
 														array.length - 1; // Check if it's the last element
 
 													return (
-														<div key={date}>
+														<span key={date}>
 															{`${
 																sortedNewObj[
 																	value
@@ -162,16 +199,25 @@ const PDFPage = ({ data, usersName, activeLockup, reportDate }) => {
 																	? ""
 																	: "+"
 															}`}
-														</div>
+														</span>
 													);
 												})}
+											) Average :{" "}
+											{
+												entryRelaseSumAverate[operator]
+													.averageEntry
+											}
 										</div>
 
 										<div
 											key={operator}
 											className='flex items-center '
 										>
-											<div className='mr-2'>Release:</div>
+											<span className=''>
+												Total Release-
+												{`Total Entry-  
+													${entryRelaseSumAverate[operator].totalEntry} ( `}
+											</span>
 											{Object.keys(
 												sortedNewObj[value][operator]
 											)
@@ -185,8 +231,8 @@ const PDFPage = ({ data, usersName, activeLockup, reportDate }) => {
 														index ===
 														array.length - 1; // Check if it's the last element
 													return (
-														<div key={date}>
-															{`${
+														<span key={date}>
+															{` ${
 																sortedNewObj[
 																	value
 																][operator][
@@ -197,9 +243,14 @@ const PDFPage = ({ data, usersName, activeLockup, reportDate }) => {
 																	? ""
 																	: "+"
 															}`}
-														</div>
+														</span>
 													);
 												})}
+											) Average :{" "}
+											{
+												entryRelaseSumAverate[operator]
+													.averageRelease
+											}
 										</div>
 									</div>
 								</div>

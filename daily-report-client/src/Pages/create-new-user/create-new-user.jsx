@@ -94,7 +94,7 @@ const CreateNewUser = () => {
 			}}
 			className='text-dark-common-color h-full '
 		>
-			<div className='w-full h-full bg-[#000000eb]  p-10 '>
+			<div className='w-full h-screen bg-[#000000eb]  p-10 '>
 				<div className='shadow-[0_0_20px_10px_#ffffff01] p-5 rounded-md bg-[#8a8a8a22] max-w-2xl mx-auto'>
 					<h3 className='text-2xl font-semibold '>Registration_</h3>
 

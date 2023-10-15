@@ -1,6 +1,6 @@
 import dataNotFound from "../../../public/dataNotFound.json";
 import Lottie from "lottie-react";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { changeNavState } from '../../redux/features/nav-value-state/navValueSlice';
 import useChangeNavStatus from '../../hooks/useChangeNavStatus/useChangeNavStatus';
@@ -10,12 +10,7 @@ import { useForm } from 'react-hook-form';
 import { format } from "date-fns";
 
 const UserHistory = () => {
-	const location = useLocation();
-	const queryParams = new URLSearchParams(location.search);
-	const adminParam = queryParams.get("admin");
-	const s_iParam = queryParams.get("s_i");
-
-	console.log(adminParam, s_iParam);
+	const { role, userServiceID } = useSelector(state => state.userSlice);
 
 	//change automatically nav name and state
 	const dispatch = useDispatch();
@@ -31,12 +26,20 @@ const UserHistory = () => {
 
 	const { data: singleUser, isLoading } = useGetSingleUserQuery({
 		key: "userServiceID",
-		value: s_iParam ?? watch("userServiceID"),
+		value:
+			role === "USER"
+				? userServiceID ?? watch("userServiceID")
+				: watch("userServiceID"),
 	}); // api request for track user on service id
 
 
+	console.log(singleUser);
+
     const user = singleUser?.user;
-    const {data: userPreviousWorkStation = []} = useGetUserPreviousHistoryQuery(user?.userServiceID);
+    const { data: userPreviousWorkStation = [] } =
+		useGetUserPreviousHistoryQuery(
+			role === "USER" ? userServiceID : watch("userServiceID")
+		);
     const a = userPreviousWorkStation;
     const previousStations = Array.isArray(a) ? [...a] : [];
     previousStations.pop()
@@ -56,7 +59,7 @@ const UserHistory = () => {
 				<div className='text-dark-common-color p-10 max-w-5xl mx-auto '>
 					<div className={`grid grid-cols-3 gap-x-10 gap-y-7`}>
 						{/* user Email  */}
-						{adminParam && (
+						{role==='ADMIN' && (
 							<form className='font-light mt-7 '>
 								<div>
 									<div>

@@ -26,6 +26,7 @@ const NavBarSection = ({ NAV_ITEM_INTI }) => {
 	
 	
 	const handelActiveRouter = (title) => {
+		console.log(title)
 		dispatch(changeNavState({ ...NAV_VALUE_INIT, activeNav: title }));
 	}
 	return (

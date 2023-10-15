@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import useChangeNavStatus from "../../hooks/useChangeNavStatus/useChangeNavStatus";
 import { changeNavState } from "../../redux/features/nav-value-state/navValueSlice";
 import { useForm } from "react-hook-form";
-import { Button, Radio } from "@mui/material";
+import { Button, Radio, Tooltip } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
 	useGetTodayReportQuery,
@@ -15,11 +15,16 @@ import GlobalLoading from "../../Shared/global-loading/global-loading";
 import { format } from "date-fns";
 
 const UpdateDate = () => {
-	const { email, name, role, userServiceID, workStationName } = useSelector(
+	let { email, name, role, userServiceID, workStationName } = useSelector(
 		state => state.userSlice
 	);
+	const [workStationNameValue, setWorkStationNameValue] =
+		useState(workStationName);
 
-	
+	const { isOpen, stationsName } = useSelector(
+		state => state.workStationList
+	); //get stations name
+
 	//change automatically nav name and state
 	const dispatch = useDispatch();
 	useChangeNavStatus(dispatch, changeNavState, true, "UPDATE DATA");
@@ -27,16 +32,26 @@ const UpdateDate = () => {
 	const [state, setState] = useState([]); // state for value
 
 	const {
+		// get todays update base on workstation
 		data: stationUpdateReport,
 		isLoading: stationUpdateReportIsLoading,
 	} = useGetTodayReportQuery({
-		stationName: workStationName,
+		stationName: workStationNameValue,
 		reportDate: "",
 		userServiceID: "",
 		numDays: 1,
 	});
-	const { data: workStationOpe, isLoading: getOperatorsIsLoading } =
-		useGetWorkStationOpeQuery(workStationName); // TODO: change the statation name dynamcit
+	const {
+		data: workStationOpe,
+		isLoading: getOperatorsIsLoading,
+		refetch,
+	} = useGetWorkStationOpeQuery(workStationNameValue); // TODO: change the statation name dynamcit
+
+	useEffect(() => {
+		// When workStationNameValue changes, refetch the query
+		console.log(" inside ", workStationNameValue, getOperatorsIsLoading);
+		refetch();
+	}, [workStationNameValue]);
 
 	const [
 		updateReport,
@@ -87,17 +102,17 @@ const UpdateDate = () => {
 		const lockupPrison = e.target.lockupPrison.value;
 		const value = [
 			{
-				userServiceID: `jailWarder${workStationName.slice(
+				userServiceID: `jailWarder${workStationNameValue.slice(
 					0,
 					3
-				)}|${workStationName}`,
+				)}|${workStationNameValue}`,
 				entry: jailWarderEntry,
 				release: jailWarderRelease,
 			},
 			{
 				activePrison,
 				lockupPrison,
-				stationName: workStationName,
+				stationName: workStationNameValue,
 				authorId: userServiceID, //TODO:Change the authr name aynamic
 			},
 		];
@@ -108,6 +123,7 @@ const UpdateDate = () => {
 		updateReport(newValue).then().catch().finally();
 	};
 
+	
 
 	return (
 		<div
@@ -125,7 +141,7 @@ const UpdateDate = () => {
 							Work Update of <br />
 							<span className='text-2xl font-semibold'>
 								{/* TODO: dynamic */}
-								{workStationName}_
+								{workStationNameValue}_
 							</span>
 						</h3>
 
@@ -152,6 +168,41 @@ const UpdateDate = () => {
 						className='font-light mt-7 '
 						onSubmit={onSubmit}
 					>
+						{role === "ADMIN" && (
+							<Tooltip
+								title={`Default Select ${
+									role === "USER"
+										? "Your Station"
+										: "All Station"
+								}`}
+							>
+								<select
+									value={state.stationName}
+									name={"stationName"}
+									onChange={e => {
+										setWorkStationNameValue(e.target.value),
+											refetch();
+									}}
+									disabled={state?.allStationNameDisable}
+									className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold mb-5'
+								>
+									<option value={"All"}>
+										Select Station_
+									</option>
+
+									{stationsName.map(stationName => (
+										<option
+											disabled={stationName === "NTMC"}
+											value={stationName}
+											key={stationName}
+										>
+											{stationName}
+										</option>
+									))}
+								</select>
+							</Tooltip>
+						)}
+
 						<div className='flex flex-col gap-5'>
 							{workStationOpe?.usersList?.map((user, index) => {
 								const { userName } = user || {};

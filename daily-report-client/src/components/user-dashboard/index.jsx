@@ -11,13 +11,21 @@ const NAV_ITEM_INTI = [
 		id: "adminNav#1",
 	},
 	{
-		title: "My Profile",
-		buttonTitle: "View Profile",
+		title: "DOWNLOAD REPORT",
+		buttonTitle: "Download",
+		icon: "file-export",
+		link: "/dashboard/download-report",
+		id: "adminNav#3",
+	},
+	{
+		title: "USER HISTORY",
+		buttonTitle: "Update",
 		icon: "arrows-rotate",
-		link: "/dashboard/user-profile?s_i=1010",
-		id: "adminNav#2",
+		link: "/dashboard/user-profile?admin=true",
+		id: "adminNav#5",
 	},
 ];
+
 const UserDashboard = () => {
 	return (
 		<div>

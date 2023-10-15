@@ -3,9 +3,11 @@
 import { onAuthStateChanged } from "firebase/auth";
 import React, { Children, useEffect, useState } from "react";
 import auth from "../../firebase.config/firebase.config";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useGetSingleUserQuery } from "../../redux/createApi/createApi";
-import { setUser } from "../../redux/features/user-slice/user-slice";
+import { setUser, toggleIsLoading } from "../../redux/features/user-slice/user-slice";
+import GlobalLoading from "../../Shared/global-loading/global-loading";
+import LoadingDataFetch from "../../Shared/loading-data-fetch/loading-data-fetch";
 
 const PrivateRouter = ({ children }) => {
 	const dispatch = useDispatch();
@@ -25,11 +27,12 @@ const PrivateRouter = ({ children }) => {
 		value: userEmail,
 	});
 
+	const user = useSelector(state => state.userSlice)
 
-	console.log(userInfo, " from prive");
 
+	
     useEffect(() => {
-		userInfo &&
+		userInfo?.user &&
 			dispatch(
 				setUser({
 					workStationName: userInfo?.user?.currentWorkStation,
@@ -41,7 +44,10 @@ const PrivateRouter = ({ children }) => {
 				})
 			);
 	}, [userInfo, dispatch]);
-	return <div>{children}</div>;
+	if (user?.isLoading) {
+		return <LoadingDataFetch  isOpen/>
+	}
+		return <div>{children}</div>;
 };
 
 export default PrivateRouter;

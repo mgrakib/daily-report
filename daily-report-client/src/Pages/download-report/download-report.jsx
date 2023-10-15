@@ -15,15 +15,27 @@ import {
 } from "../../redux/createApi/createApi";
 import GlobalLoading from "../../Shared/global-loading/global-loading";
 import PDFPage from "./pdf-page";
+import { useLocation } from "react-router-dom";
 
 const STATE_INIT = {
 	allStationNameDisable: true,
 	individualReportCollops: true,
-	stationName: null,
-	reportDate: null,
-	userServiceID: null,
+	stationName: "",
+	reportDate: "",
+	userServiceID: "",
 };
 const DownloadReport = () => {
+	const { role, userServiceID, workStationName } = useSelector(
+		state => state.userSlice
+	);
+
+	useEffect(() => {
+		setState(pre => ({
+			...pre,
+			stationName: workStationName,
+		}));
+	}, [workStationName]);
+
 	const [state, setState] = useState({ ...STATE_INIT });
 	const [targetUser, setTargetUser] = useState(null); //this value will display at the disabled field
 
@@ -59,21 +71,21 @@ const DownloadReport = () => {
 		stationName: state.stationName,
 		reportDate: state.reportDate,
 		userServiceID: state.userServiceID,
-		numDays: 5 //TODO: make it dyanamci
+		numDays: 5, //TODO: make it dyanamci
 	});
 
-	
-	const usersName = stationUpdateReport?.usersNameWithID.reduce((acc, cru) => {
-		for (let id in cru) {
-			if (!id.startsWith("_")) {
-				acc[id] = cru[id]
+	const usersName = stationUpdateReport?.usersNameWithID.reduce(
+		(acc, cru) => {
+			for (let id in cru) {
+				if (!id.startsWith("_")) {
+					acc[id] = cru[id];
+				}
 			}
-		}
-		return acc
-	}, {})
+			return acc;
+		},
+		{}
+	);
 
-	console.log(stationUpdateReport);
-	
 	const handelChange = e => {
 		const { name, value } = e.target;
 		setState(pre => ({
@@ -88,23 +100,26 @@ const DownloadReport = () => {
 	};
 
 	useEffect(() => {
-		// section collops or not
-		if (state.individualReportCollops) {
-			setState(pre => ({
-				...pre,
-				stationName: "All",
-				userServiceID: "",
-				reportDate: "",
-			}));
-		} else if (!state.individualReportCollops) {
-			setState(pre => ({
-				...pre,
-				stationName: "",
-				reportDate: "",
-			}));
+		if (role === "ADMIN") {
+			// section collops or not
+			if (state.individualReportCollops) {
+				setState(pre => ({
+					...pre,
+					stationName: "All",
+					userServiceID: "",
+					reportDate: "",
+				}));
+			} else if (!state.individualReportCollops) {
+				setState(pre => ({
+					...pre,
+					stationName: "",
+					reportDate: "",
+				}));
+			}
 		}
-	}, [state.individualReportCollops]);
+	}, [state.individualReportCollops, role]);
 
+	console.log(state);
 	return (
 		<div
 			style={{
@@ -117,7 +132,7 @@ const DownloadReport = () => {
 			<div className='w-full h-screen overflow-y-auto  bg-[#000000eb]  p-10 '>
 				<div className='shadow-[0_0_20px_10px_#ffffff01] p-5 rounded-md bg-[#8a8a8a22] max-w-2xl mx-auto'>
 					<h3 className='text-2xl font-semibold '>
-						Download Report_
+						{role === "USER" ? "View Report_" : "Download Report_"}
 					</h3>
 
 					<form
@@ -125,6 +140,12 @@ const DownloadReport = () => {
 						onSubmit={handelSubmit}
 					>
 						<div>
+							{/* {role === "ADMIN" && (
+								<>
+								
+								</>
+							)} */}
+
 							{/* section for station  */}
 							<div
 								className={`grid grid-cols-2 gap-x-10 gap-y-7  ${
@@ -140,7 +161,13 @@ const DownloadReport = () => {
 										<label htmlFor=''>Station Name_</label>
 									</div>
 
-									<Tooltip title='Default Select All Station'>
+									<Tooltip
+										title={`Default Select ${
+											role === "USER"
+												? "Your Station"
+												: "All Station"
+										}`}
+									>
 										<select
 											value={state.stationName}
 											name={"stationName"}
@@ -168,23 +195,25 @@ const DownloadReport = () => {
 										</select>
 									</Tooltip>
 
-									<div>
-										<Tooltip title='Check it if you want to download Specific One Station Report'>
-											<Checkbox
-												onChange={() =>
-													setState(pre => ({
-														...pre,
-														allStationNameDisable:
-															!state.allStationNameDisable,
-													}))
-												}
-												size='small'
-												sx={{
-													color: "gray",
-												}}
-											/>
-										</Tooltip>
-									</div>
+									{role === "ADMIN" && (
+										<div>
+											<Tooltip title='Check it if you want to download Specific One Station Report'>
+												<Checkbox
+													onChange={() =>
+														setState(pre => ({
+															...pre,
+															allStationNameDisable:
+																!state.allStationNameDisable,
+														}))
+													}
+													size='small'
+													sx={{
+														color: "gray",
+													}}
+												/>
+											</Tooltip>
+										</div>
+									)}
 								</div>
 
 								{/* user Report Date  */}
@@ -206,14 +235,39 @@ const DownloadReport = () => {
 
 							{/* collops  */}
 							<div className='flex items-center my-6'>
-								<Tooltip title='Check it if you want to download Specific One Station Report'>
+								<Tooltip
+									title={`Check it if you want to ${
+										role === "USER" ? "View" : "Download"
+									} Specific One Station Report`}
+								>
 									<Checkbox
 										onChange={() =>
-											setState(pre => ({
-												...pre,
-												individualReportCollops:
-													!state.individualReportCollops,
-											}))
+											setState(pre => {
+												if (role === "USER") {
+													if (!state.userServiceID) {
+														return {
+															...pre,
+															individualReportCollops:
+																!state.individualReportCollops,
+															userServiceID,
+														};
+													} else {
+														return {
+															...pre,
+															individualReportCollops:
+																!state.individualReportCollops,
+															userServiceID: "",
+														};
+													}
+												} else {
+													return {
+														...pre,
+														individualReportCollops:
+															!state.individualReportCollops,
+														userServiceID,
+													};
+												}
+											})
 										}
 										size='small'
 										sx={{
@@ -226,12 +280,15 @@ const DownloadReport = () => {
 										htmlFor=''
 										className='text-[13px]'
 									>
-										Check it, If want to download Individual
+										{`Check it, If want to ${
+											role === "USER"
+												? "View"
+												: "Download"
+										} Individual`}
 										Report_
 									</label>
 								</div>
 							</div>
-
 							{/* section for personal report  */}
 							<div
 								className={`grid grid-cols-2 gap-x-10 gap-y-7  ${
@@ -246,6 +303,7 @@ const DownloadReport = () => {
 										<label htmlFor=''>Service ID_</label>
 									</div>
 									<input
+										disabled={role === "USER"}
 										value={state.userServiceID}
 										name={"userServiceID"}
 										onChange={handelChange}
