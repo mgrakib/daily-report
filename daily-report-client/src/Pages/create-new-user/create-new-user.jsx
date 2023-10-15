@@ -1,13 +1,16 @@
 /** @format */
 
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useChangeNavStatus from "../../hooks/useChangeNavStatus/useChangeNavStatus";
 import { changeNavState } from "../../redux/features/nav-value-state/navValueSlice";
 import { Button, Radio } from "@mui/material";
 import { useState } from "react";
 import { useCreateNewUserMutation } from "../../redux/createApi/createApi";
 import GlobalLoading from "../../Shared/global-loading/global-loading";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { createUser } from "../../redux/features/user-slice/user-slice";
 
 const CreateNewUser = () => {
 	//change automatically nav name and state
@@ -19,9 +22,7 @@ const CreateNewUser = () => {
 		setSelectedGender(event.target.value);
 	};
 
-	const [createUser, { data: createdUser, isLoading: createUserIsLoading }] =
-		useCreateNewUserMutation();
-
+	// 
 	const {
 		register,
 		handleSubmit,
@@ -30,13 +31,59 @@ const CreateNewUser = () => {
 	} = useForm();
 
 	const onSubmit = data => {
-		const userInfo = {
-			...data,
-			userGender: selectedGender,
-		};
+		const formData = new FormData();
+		formData.append("image", data.image[0]);
 
-		createUser(userInfo);
+		
+		axios
+			.post(
+				`https://api.imgbb.com/1/upload?key=7e5956cd0cd8d26092b63b67f13f740f`, //TODO: make it dyanmic
+				formData
+			)
+			.then(res => {
+				const imgURL = res?.data?.data?.display_url;
+
+				if (res.data.success) {
+					const userInfo = {
+						...data,
+						userImage: imgURL,
+						userGender: selectedGender,
+					};
+
+					dispatch(
+						createUser({
+							...userInfo,
+						})
+					)
+						.then(response => {
+							if (response && !response.error) {
+								// Signup was successful, navigate to the home page
+								console.log("okay");
+								// navigate("/dashboard");
+							} else {
+								// Handle error, if any
+							}
+						})
+						.catch(error => {
+							// Handle error
+						});
+
+					// createUser(userInfo)
+					// 	.then(res => {
+					// 		res?.error?.status
+					// 			? toast.error(res?.error?.data.message)
+					// 			: toast.success("User created Successfully");
+					// 	})
+					// 	.catch(err => {
+					// 		console.log(err);
+					// 	});
+				}
+			});
 	};
+
+	const userValue = useSelector(state => state.userSlice);
+
+	console.log(userValue)
 
 	return (
 		<div
@@ -179,6 +226,28 @@ const CreateNewUser = () => {
 									</p>
 								)}
 							</div>
+							<div>
+								<label
+									htmlFor='image'
+									className='block mb-2 text-sm'
+								>
+									Select Image:
+								</label>
+								<input
+									type='file'
+									id='image'
+									{...register("image", { required: true })}
+									accept='image/*'
+								/>
+								{errors.image?.type === "required" && (
+									<p
+										role='alert'
+										className='text-red-500'
+									>
+										Image is required
+									</p>
+								)}
+							</div>
 							{/* user Gender  */}
 							<div className='col-span-2'>
 								<div>
@@ -245,7 +314,7 @@ const CreateNewUser = () => {
 
 						<div>
 							<Button
-								disabled={createUserIsLoading}
+								disabled={false}
 								type='submit'
 								className='w-full py-2 bg-[#3498DB] mt-5 text-white'
 							>
@@ -256,7 +325,7 @@ const CreateNewUser = () => {
 				</div>
 			</div>
 
-			<GlobalLoading isOpen={createUserIsLoading} />
+			<GlobalLoading isOpen={false} />
 		</div>
 	);
 };

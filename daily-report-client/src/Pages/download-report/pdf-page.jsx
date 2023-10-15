@@ -112,7 +112,7 @@ const PDFPage = ({ data, usersName, activeLockup, reportDate }) => {
 								{totalEntryRelease?.[value]?.totalEntry}
 							</span>
 							<span className='mx-2'>
-								{" Pri-"}
+								{" Release-"}
 								{totalEntryRelease?.[value]?.totalRelease}
 							</span>
 							<span className='mx-2'>

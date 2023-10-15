@@ -1,5 +1,5 @@
 /** @format */
-
+import toast, { Toaster } from "react-hot-toast";
 import { Outlet } from "react-router-dom";
 import AdminDashboard from "./components/AdminDashboard";
 import UserDashboard from "./components/user-dashboard";
@@ -23,6 +23,7 @@ function Dashboard() {
 
 				{/* <TESt /> */}
 			</div>
+			<Toaster />
 		</>
 	);
 }

@@ -1,6 +1,6 @@
 /** @format */
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useChangeNavStatus from "../../hooks/useChangeNavStatus/useChangeNavStatus";
 import { changeNavState } from "../../redux/features/nav-value-state/navValueSlice";
 import { useForm } from "react-hook-form";
@@ -15,7 +15,11 @@ import GlobalLoading from "../../Shared/global-loading/global-loading";
 import { format } from "date-fns";
 
 const UpdateDate = () => {
-	const station = "Bagerhat District Jail";
+	const { email, name, role, userServiceID, workStationName } = useSelector(
+		state => state.userSlice
+	);
+
+	
 	//change automatically nav name and state
 	const dispatch = useDispatch();
 	useChangeNavStatus(dispatch, changeNavState, true, "UPDATE DATA");
@@ -26,13 +30,13 @@ const UpdateDate = () => {
 		data: stationUpdateReport,
 		isLoading: stationUpdateReportIsLoading,
 	} = useGetTodayReportQuery({
-		stationName: station,
+		stationName: workStationName,
 		reportDate: "",
 		userServiceID: "",
 		numDays: 1,
 	});
 	const { data: workStationOpe, isLoading: getOperatorsIsLoading } =
-		useGetWorkStationOpeQuery(station); // TODO: change the statation name dynamcit
+		useGetWorkStationOpeQuery(workStationName); // TODO: change the statation name dynamcit
 
 	const [
 		updateReport,
@@ -83,15 +87,18 @@ const UpdateDate = () => {
 		const lockupPrison = e.target.lockupPrison.value;
 		const value = [
 			{
-				userServiceID: `jailWarder${station.slice(0, 3)}|${station}`,
+				userServiceID: `jailWarder${workStationName.slice(
+					0,
+					3
+				)}|${workStationName}`,
 				entry: jailWarderEntry,
 				release: jailWarderRelease,
 			},
 			{
 				activePrison,
 				lockupPrison,
-				stationName: station,
-				authorId: "1001", //TODO:Change the authr name aynamic
+				stationName: workStationName,
+				authorId: userServiceID, //TODO:Change the authr name aynamic
 			},
 		];
 
@@ -111,14 +118,14 @@ const UpdateDate = () => {
 			}}
 			className='text-dark-common-color h-full '
 		>
-			<div className='w-full h-full bg-[#000000eb]  p-10 '>
+			<div className=' w-full h-screen overflow-y-auto bg-[#000000eb]  p-10 '>
 				<div className='shadow-[0_0_20px_10px_#ffffff01] p-5 rounded-md bg-[#8a8a8a22] max-w-2xl mx-auto'>
 					<div className='flex items-center justify-between'>
 						<h3 className=' '>
 							Work Update of <br />
 							<span className='text-2xl font-semibold'>
 								{/* TODO: dynamic */}
-								{station}_ 
+								{workStationName}_
 							</span>
 						</h3>
 

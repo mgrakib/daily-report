@@ -50,35 +50,37 @@ const UserHistory = () => {
 					"url(https://i.ibb.co/SVRN9jZ/technology.webp)",
 				backgroundSize: "cover",
 			}}
-			className="h-full"
+			className='h-full'
 		>
 			<div className='w-full min-h-full bg-[#000000eb]  '>
 				<div className='text-dark-common-color p-10 max-w-5xl mx-auto '>
 					<div className={`grid grid-cols-3 gap-x-10 gap-y-7`}>
 						{/* user Email  */}
-						{adminParam && <form className='font-light mt-7 '>
-							<div>
+						{adminParam && (
+							<form className='font-light mt-7 '>
 								<div>
-									<label htmlFor=''>Service ID_</label>
+									<div>
+										<label htmlFor=''>Service ID_</label>
+									</div>
+									<Tooltip
+										title="You can't modify this field"
+										disableFocusListener
+									>
+										<input
+											className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold'
+											{...register("userServiceID", {
+												required: true,
+											})}
+											aria-invalid={
+												errors.userServiceID
+													? "true"
+													: "false"
+											}
+										/>
+									</Tooltip>
 								</div>
-								<Tooltip
-									title="You can't modify this field"
-									disableFocusListener
-								>
-									<input
-										className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold'
-										{...register("userServiceID", {
-											required: true,
-										})}
-										aria-invalid={
-											errors.userServiceID
-												? "true"
-												: "false"
-										}
-									/>
-								</Tooltip>
-							</div>
-						</form>}
+							</form>
+						)}
 					</div>
 
 					<div className='mt-10'>
@@ -89,7 +91,7 @@ const UserHistory = () => {
 									{/* image  */}
 									<div className='h-[250px]'>
 										<img
-											src='https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80'
+											src={user?.avatar}
 											alt=''
 											className='w-[80%] h-full object-cover mx-auto'
 										/>

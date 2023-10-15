@@ -15,6 +15,7 @@ import {
 import GlobalLoading from "../../Shared/global-loading/global-loading";
 import { useEffect, useState } from "react";
 import { changeStatus } from "../../redux/features/work-station-list/work-station-list";
+import toast from "react-hot-toast";
 const TransferUser = () => {
 	const [targetUser, setTargetUser] = useState(null); //this value will display at the disabled field
 
@@ -60,7 +61,11 @@ const TransferUser = () => {
 		const s_i = data.userServiceID;
 		const new_s = data.newWorkStation;
 		transferUser({ s_i, new_s }).then(res => {
+			res?.error?.status
+				? toast.error(res?.error?.data.message)
+				: toast.success("User Transfer Successfully");
 			reset();
+			
 		}).catch(e => {
 			console.log(e)
 		})

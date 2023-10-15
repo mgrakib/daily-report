@@ -8,6 +8,7 @@ import TransferUser from "../Pages/transfer-user/transfer-user";
 import UpdateDate from "../Pages/update-data/update-data";
 import DownloadReport from "../Pages/download-report/download-report";
 import UserHistory from "../Pages/user-history/user-history";
+import PrivateRouter from "../layout/private-router/private-router";
 
 
 
@@ -26,7 +27,11 @@ const router = createBrowserRouter([
 			},
 			{
 				path: "/dashboard/transfer-user",
-				element: <TransferUser />,
+				element: (
+					<PrivateRouter>
+						<TransferUser />
+					</PrivateRouter>
+				),
 			},
 			{
 				path: "/dashboard/download-report",
@@ -34,7 +39,11 @@ const router = createBrowserRouter([
 			},
 			{
 				path: "/dashboard/update-data",
-				element: <UpdateDate />,
+				element: (
+					<PrivateRouter>
+						<UpdateDate />
+					</PrivateRouter>
+				),
 			},
 			{
 				path: "/dashboard/user-profile",
