@@ -1,30 +1,27 @@
 /** @format */
 const bcrypt = require("bcrypt");
-const Users = require('../models/user')
-const { findUser, createNewUser } = require('./userService')
-const error = require('../utils/error')
-const createUserService = async (body) => {
-
+const Users = require("../models/user");
+const { findUser, createNewUser } = require("./userService");
+const error = require("../utils/error");
+const createUserService = async body => {
 	const {
 		userEmail,
 		userGender,
 		userJoiningDate,
 		userName,
+		userImage,
 		userServiceID,
 		password,
-		
 	} = body;
 
+	const salt = bcrypt.genSaltSync(10);
+	const userPassword = bcrypt.hashSync(password, salt);
 
+	const isuser = await findUser("userEmail", userEmail);
+	const isuser2 = await findUser("userServiceID", userServiceID);
 
-	
-    const salt = bcrypt.genSaltSync(10);
-	const hashPassword = bcrypt.hashSync(password, salt);
-    
-	const user = await  findUser("userEmail", userEmail);
-	
-	if (user) {
-		throw error('User Already Exist', 400)
+	if (isuser || isuser2) {
+		throw error("User Already Exist", 400);
 	}
 
 	const newUser = await createNewUser(
@@ -33,11 +30,11 @@ const createUserService = async (body) => {
 		userJoiningDate,
 		userName,
 		userServiceID,
-		hashPassword,
-		
+		userImage,
+		userPassword
 	);
-	
-	return newUser
+
+	return newUser;
 };
 
 module.exports = {

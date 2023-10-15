@@ -22,21 +22,26 @@ const createNewUser = async (
 	userJoiningDate,
 	userName,
 	userServiceID,
-	hashPassword
+	userImage,
+	userPassword
 ) => {
+
+	
+	
 	const user = new Users({
 		userEmail,
 		userGender,
 		userJoiningDate,
 		userName,
 		userServiceID,
-		password: hashPassword,
+		avatar: userImage,
+		password: userPassword,
 	});
 	await user.save();
 	const saveUserNameWithID = new UserNameWithID({
 		[userServiceID]: userName,
 	});
-	await saveUserNameWithID.save()
+	await saveUserNameWithID.save();
 	return user;
 };
 
