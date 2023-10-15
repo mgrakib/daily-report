@@ -1,92 +1,35 @@
 {
-	"1010|Na": {
-		"10-10-23": {
-			"entry": 100,
-			"release": 100
+	"Bagerhat District Jail": {
+		"jailWarderBag|Bagerhat District Jail": {
+			"2023-10-15": { "entry": 100, "release": 100 }
 		},
-		"11-10-23": {
-			"entry": 101,
-			"release": 101
+		"1001|Bagerhat District Jail": {
+			"2023-10-15": { "entry": 125, "release": 120 }
+		},
+		"1007|Bagerhat District Jail": {
+			"2023-10-15": { "entry": 125, "release": 180 }
 		}
 	},
-	"1011|Na": {
-		"10-10-23": {
-			"entry": 200,
-			"release": 200
+	"Dhaka Central Jail": {
+		"jailWarderDha|Dhaka Central Jail": {
+			"2023-10-14": { "entry": 200, "release": 200 },
+			"2023-10-13": { "entry": 369, "release": 369 },
+			"2023-10-15": { "entry": 10, "release": 10 }
 		},
-		"11-10-23": {
-			"entry": 201,
-			"release": 201
+		"1000|Dhaka Central Jail": {
+			"2023-10-14": { "entry": 100, "release": 100 },
+			"2023-10-13": { "entry": 233, "release": 233 },
+			"2023-10-15": { "entry": 19, "release": 0 }
+		},
+		"1012|Dhaka Central Jail": {
+			"2023-10-14": { "entry": 0, "release": 0 },
+			"2023-10-13": { "entry": 174, "release": 174 },
+			"2023-10-15": { "entry": 11, "release": 0 }
 		}
 	},
-	"jailWader|Na": {
-		"10-10-23": {
-			"entry": 300,
-			"release": 300
-		},
-		"11-10-23": {
-			"entry": 301,
-			"release": 301
-		}
-	},
-	"1012|Dh": {
-		"10-10-23": {
-			"entry": 100,
-			"release": 100
-		},
-		"11-10-23": {
-			"entry": 101,
-			"release": 101
-		}
-	},
-	"1013|Dh": {
-		"10-10-23": {
-			"entry": 200,
-			"release": 200
-		},
-		"11-10-23": {
-			"entry": 201,
-			"release": 201
-		}
-	},
-	"jailWader|Dh": {
-		"10-10-23": {
-			"entry": 300,
-			"release": 300
-		},
-		"11-10-23": {
-			"entry": 301,
-			"release": 301
-		}
-	},
-	"1014|Ba": {
-		"10-10-23": {
-			"entry": 100,
-			"release": 100
-		},
-		"11-10-23": {
-			"entry": 101,
-			"release": 101
-		}
-	},
-	"1015|Ba": {
-		"10-10-23": {
-			"entry": 200,
-			"release": 200
-		},
-		"11-10-23": {
-			"entry": 201,
-			"release": 201
-		}
-	},
-	"jailWader|Ba": {
-		"10-10-23": {
-			"entry": 300,
-			"release": 300
-		},
-		"11-10-23": {
-			"entry": 301,
-			"release": 301
+	"Thakurgao District Jail": {
+		"jailWarderTha|Thakurgao District Jail": {
+			"2023-10-14": { "entry": 0, "release": 0 }
 		}
 	}
 }

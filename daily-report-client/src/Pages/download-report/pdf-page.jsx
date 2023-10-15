@@ -4,9 +4,8 @@ import { format } from "date-fns";
 import { useState } from "react";
 
 const PDFPage = ({ data, usersName, activeLockup, reportDate }) => {
+	const reportD = reportDate || format(new Date(), "yyyy-MM-dd");
 
-	const reportD = reportDate || format(new Date(), 'yyyy-MM-dd') 
-	console.log(reportD);
 	const [todaysReport, setTodaysReport] = useState(0);
 
 	const objectArr = Object.keys(data);
@@ -53,6 +52,25 @@ const PDFPage = ({ data, usersName, activeLockup, reportDate }) => {
 			sortedNewObj[key] = newObj[key];
 		});
 
+	const totalEntryRelease = {};
+
+	for (const jailName in sortedNewObj) {
+		let totalEntry = 0;
+		let totalRelease = 0;
+
+		const jailData = sortedNewObj[jailName];
+		for (const warderName in jailData) {
+			for (const itemData of Object.keys(jailData[warderName])) {
+				if (itemData === reportD) {
+					totalEntry += jailData[warderName][itemData].entry;
+					totalRelease += jailData[warderName][itemData].release;
+				}
+			}
+		}
+
+		totalEntryRelease[jailName] = { totalEntry, totalRelease };
+	}
+
 	const va = Object.keys(sortedNewObj).map(value => {
 		const array = [];
 		Object.keys(sortedNewObj[value]).map(station => {
@@ -80,29 +98,33 @@ const PDFPage = ({ data, usersName, activeLockup, reportDate }) => {
 				});
 
 				const allItems = otherItems.concat(jailWarderItems);
-
+				console.log();
 				return (
 					<div key={value}>
 						<div className='text-[15px] text-black bg-[#34A853] px-1 font-bold py-1'>
 							{`(${i + 1}) ${value}`}{" "}
 							<span className='mx-2'>
 								{" Pri-"}
-								{activeLockup?.[value]?.lockupPrison}
+								{activeLockup?.[value]?.lockupPrison ?? 0}
 							</span>
 							<span className='mx-2'>
 								{" Entry-"}
-								{todaysReport}
+								{totalEntryRelease?.[value]?.totalEntry}
 							</span>
 							<span className='mx-2'>
 								{" Pri-"}
-								{todaysReport?.reportDayRelease}
+								{totalEntryRelease?.[value]?.totalRelease}
 							</span>
 							<span className='mx-2'>
 								{"Active Pri-"}
-								{activeLockup?.[value]?.activePrison}
+								{activeLockup?.[value]?.activePrison ?? 0}
 							</span>
 						</div>
 						{allItems.map(operator => {
+							// console.log(
+							// 	activeLockup[operator.split("|")[1]],
+							// 	" this iis "
+							// );
 							return (
 								//    the
 								<div key={operator}>
@@ -123,15 +145,10 @@ const PDFPage = ({ data, usersName, activeLockup, reportDate }) => {
 														new Date(a)
 												)
 												.map((date, index, array) => {
-													console.log(
-														date === reportD,
-														"date", date, "res", reportD
-													);
-													
 													const isLast =
 														index ===
 														array.length - 1; // Check if it's the last element
-													
+
 													return (
 														<div key={date}>
 															{`${

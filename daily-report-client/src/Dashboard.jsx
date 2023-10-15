@@ -21,7 +21,7 @@ function Dashboard() {
 					<Outlet />
 				</div>
 
-				<TESt />
+				{/* <TESt /> */}
 			</div>
 		</>
 	);
