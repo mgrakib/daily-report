@@ -8,8 +8,11 @@ import { useGetSingleUserQuery } from "../../redux/createApi/createApi";
 import { setUser, toggleIsLoading } from "../../redux/features/user-slice/user-slice";
 import GlobalLoading from "../../Shared/global-loading/global-loading";
 import LoadingDataFetch from "../../Shared/loading-data-fetch/loading-data-fetch";
+import { Navigate, useLocation } from "react-router-dom";
 
 const PrivateRouter = ({ children }) => {
+	const { pathname } = useLocation();
+	const { role, isLoading, email } = useSelector(state => state.userSlice);
 	const dispatch = useDispatch();
 	const [userEmail, setUserEmail] = useState("");
 	useEffect(() => {
@@ -27,7 +30,6 @@ const PrivateRouter = ({ children }) => {
 		value: userEmail,
 	});
 
-	const user = useSelector(state => state.userSlice)
 
 
 	
@@ -44,10 +46,19 @@ const PrivateRouter = ({ children }) => {
 				})
 			);
 	}, [userInfo, dispatch]);
-	if (user?.isLoading) {
+	if (isLoading) {
 		return <LoadingDataFetch  isOpen/>
 	}
-		return <div>{children}</div>;
+		if (!isLoading && !email) {
+			return (
+				<Navigate
+					to='/'
+					state={{ path: pathname }}
+				/>
+			);
+		} else {
+			return <div>{children}</div>;
+		}
 };
 
 export default PrivateRouter;

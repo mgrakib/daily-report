@@ -10,9 +10,13 @@ import { useCreateNewUserMutation } from "../../redux/createApi/createApi";
 import GlobalLoading from "../../Shared/global-loading/global-loading";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { createUser } from "../../redux/features/user-slice/user-slice";
+import { createUser, singIn } from "../../redux/features/user-slice/user-slice";
+import { useNavigate, useParams } from "react-router-dom";
 
 const CreateNewUser = () => {
+	const navigate = useNavigate();
+
+	const { isLoading } = useSelector(state => state.userSlice);
 	//change automatically nav name and state
 	const dispatch = useDispatch();
 	useChangeNavStatus(dispatch, changeNavState, true, "CREATE NEW USER");
@@ -25,64 +29,31 @@ const CreateNewUser = () => {
 	//
 	const {
 		register,
-		handleSubmit,
-		watch,
 		formState: { errors },
+		handleSubmit,
 	} = useForm();
 
 	const onSubmit = data => {
-		const formData = new FormData();
-		formData.append("image", data.image[0]);
-
-		axios
-			.post(
-				`https://api.imgbb.com/1/upload?key=7e5956cd0cd8d26092b63b67f13f740f`, //TODO: make it dyanmic
-				formData
-			)
-			.then(res => {
-				const imgURL = res?.data?.data?.display_url;
-
-				if (res.data.success) {
-					const userInfo = {
-						...data,
-						userImage: imgURL,
-						userGender: selectedGender,
-					};
-
-					dispatch(
-						createUser({
-							...userInfo,
-						})
-					)
-						.then(response => {
-							if (response && !response.error) {
-								// Signup was successful, navigate to the home page
-								console.log("okay");
-								// navigate("/dashboard");
-							} else {
-								// Handle error, if any
-							}
-						})
-						.catch(error => {
-							// Handle error
-						});
-
-					// createUser(userInfo)
-					// 	.then(res => {
-					// 		res?.error?.status
-					// 			? toast.error(res?.error?.data.message)
-					// 			: toast.success("User created Successfully");
-					// 	})
-					// 	.catch(err => {
-					// 		console.log(err);
-					// 	});
+		const { email, password } = data;
+		dispatch(
+			singIn({
+				email,
+				password,
+			})
+		)
+			.then(response => {
+				if (response && !response.error) {
+					// Signup was successful, navigate to the home page
+					navigate("/dashboard");
+				} else {
+					// Handle error, if any
 				}
-			});
+			})
+			.catch(err => {});
 	};
-
 	const userValue = useSelector(state => state.userSlice);
 
-	console.log(userValue);
+	
 
 	return (
 		<div
@@ -102,8 +73,6 @@ const CreateNewUser = () => {
 						onSubmit={handleSubmit(onSubmit)}
 					>
 						<div className='grid grid-cols-2 gap-x-10 gap-y-7'>
-							
-
 							{/* user Email  */}
 							<div>
 								<div>
@@ -111,7 +80,7 @@ const CreateNewUser = () => {
 								</div>
 								<input
 									className='outline-none py-2 px-2 w-full text-dark-dashboard-color font-semibold'
-									{...register("userEmail", {
+									{...register("email", {
 										required: true,
 									})}
 									aria-invalid={
@@ -151,11 +120,9 @@ const CreateNewUser = () => {
 									</p>
 								)}
 							</div>
-							
-							
 						</div>
 
-						<div className="mt-5">
+						<div className='mt-5'>
 							<Button
 								disabled={false}
 								type='submit'

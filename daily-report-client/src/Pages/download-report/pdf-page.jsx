@@ -110,8 +110,7 @@ const PDFPage = ({ data, usersName, activeLockup, reportDate }) => {
 	}
 	return (
 		<div className='mt-5'>
-			<Button onClick={() => downloadPDF(sortedNewObj)}>Download</Button>
-
+			
 			{Object.keys(sortedNewObj).map((value, i) => {
 				const stationKeys = Object.keys(sortedNewObj[value]);
 				const jailWarderItems = [];

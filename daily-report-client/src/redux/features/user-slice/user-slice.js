@@ -64,9 +64,12 @@ export const createUser = createAsyncThunk(
 export const singIn = createAsyncThunk(
 	"userSlice/singIn",
 	async ({ email, password }) => {
+		console.log(email, password);
 		const data = await signInWithEmailAndPassword(auth, email, password);
 
-		const result = await fetch(`${baseRoute}/get-user?email=${email}`);
+		const result = await fetch(
+			`${baseRoute}/u/user?key='email'&value=${email}`
+		);
 		const userInfo = await result.json();
 
 		return {

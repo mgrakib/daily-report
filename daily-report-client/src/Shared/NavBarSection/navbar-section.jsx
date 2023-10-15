@@ -1,6 +1,6 @@
 /** @format */
 
-import { FiUserPlus } from "react-icons/fi";
+import { FiLogOut, FiUserPlus } from "react-icons/fi";
 import NavCard from "../../Shared/NavFloatinCard/NavCard";
 import {
 	MdOutlineHistoryToggleOff,
@@ -14,21 +14,28 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { changeNavState } from "../../redux/features/nav-value-state/navValueSlice";
-
-
-
-
+import { signOut } from "firebase/auth";
+import auth from "../../firebase.config/firebase.config";
+import { logOut } from "../../redux/features/user-slice/user-slice";
 
 const NavBarSection = ({ NAV_ITEM_INTI }) => {
 	const NAV_VALUE_INIT = useSelector(state => state.navReducer);
-	const dispatch = useDispatch()
-	
-	
-	
-	const handelActiveRouter = (title) => {
-		console.log(title)
+	const dispatch = useDispatch();
+
+	const handelSingOut = () => {
+		signOut(auth)
+			.then(() => {
+				dispatch(logOut());
+			})
+			.catch(error => {
+				// An error happened.
+			});
+	};
+
+	const handelActiveRouter = title => {
+		console.log(title);
 		dispatch(changeNavState({ ...NAV_VALUE_INIT, activeNav: title }));
-	}
+	};
 	return (
 		<div className={""}>
 			<div
@@ -38,6 +45,17 @@ const NavBarSection = ({ NAV_ITEM_INTI }) => {
 						: "transform translate-x-0 opacity-100"
 				} duration-1000 relative z-50 `}
 			>
+				<div className='mb-5 text-end text-white flex items-center gap-2 justify-end '>
+					<div
+						onClick={handelSingOut}
+						className='flex items-center gap-2 cursor-pointer w-[70px] hover:w-[100px] hover:bg-red-400 py-2 px-3 rounded duration-500'
+					>
+						<span>
+							<FiLogOut />
+						</span>
+						<span className='text-[13px]'>Logout</span>
+					</div>
+				</div>
 				<div className='grid grid-cols-3 gap-10'>
 					{NAV_ITEM_INTI.map(navItem => (
 						<Link
@@ -102,10 +120,24 @@ const NavBarSection = ({ NAV_ITEM_INTI }) => {
 					</div>
 				</ul>
 
+				<li //Logout
+					onClick={handelSingOut}
+					className={`text-secondary-color font-bold flex  py-3 px-2 mt-auto hover:bg-effect-color items-center duration-500 gap-3 cursor-pointer  ${
+						NAV_VALUE_INIT?.isOpen ? "animate-bounce-custom" : ""
+					}`}
+				>
+					<span>
+						<FiLogOut />
+					</span>
+					<span className='text-[13px]'>Logout</span>
+				</li>
+
 				<Link to={"/dashboard"}>
 					<li //li for USER HISTORY
 						className={`text-dark-common-color flex  py-3 px-2 mt-auto hover:bg-effect-color items-center duration-500 gap-3 cursor-pointer  ${
-							NAV_VALUE_INIT?.isOpen ? "animate-bounce-custom" : ""
+							NAV_VALUE_INIT?.isOpen
+								? "animate-bounce-custom"
+								: ""
 						}`}
 						onClick={() => {
 							dispatch(

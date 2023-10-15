@@ -9,6 +9,7 @@ import UpdateDate from "../Pages/update-data/update-data";
 import DownloadReport from "../Pages/download-report/download-report";
 import UserHistory from "../Pages/user-history/user-history";
 import PrivateRouter from "../layout/private-router/private-router";
+import WelcomePage from "../Pages/welcome-page/welcome-page";
 
 const router = createBrowserRouter([
 	{
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
 			</PrivateRouter>
 		),
 		children: [
+			{
+				path: "/dashboard",
+				element: <WelcomePage />,
+			},
 			{
 				path: "/dashboard/create-new-user",
 				element: <CreateNewUser />,
