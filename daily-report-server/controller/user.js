@@ -9,6 +9,7 @@ const getSingleUser = async (req, res, next) => {
 		const key = req.query.key;
 		const value = req.query.value;
 		
+		console.log(key, value, ' useljr ')
 		const user = await findUser(key, value);
 		res.status(200).json({ user });
 	} catch (e) {
