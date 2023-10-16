@@ -11,8 +11,12 @@ import GlobalLoading from "../../Shared/global-loading/global-loading";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { createUser } from "../../redux/features/user-slice/user-slice";
+import { useNavigate } from "react-router-dom";
 
 const CreateNewUser = () => {
+	
+	const [isLoading,setIsLoading] = useState(false)
+	const navigate = useNavigate();
 	//change automatically nav name and state
 	const dispatch = useDispatch();
 	useChangeNavStatus(dispatch, changeNavState, true, "CREATE NEW USER");
@@ -31,6 +35,7 @@ const CreateNewUser = () => {
 	} = useForm();
 
 	const onSubmit = data => {
+		setIsLoading(true)
 		const formData = new FormData();
 		formData.append("image", data.image[0]);
 
@@ -58,8 +63,9 @@ const CreateNewUser = () => {
 						.then(response => {
 							if (response && !response.error) {
 								// Signup was successful, navigate to the home page
-								console.log("okay");
-								// navigate("/dashboard");
+								toast("User Created Successfully");
+								navigate("/dashboard");
+								
 							} else {
 								// Handle error, if any
 							}
@@ -68,22 +74,16 @@ const CreateNewUser = () => {
 							// Handle error
 						});
 
-					// createUser(userInfo)
-					// 	.then(res => {
-					// 		res?.error?.status
-					// 			? toast.error(res?.error?.data.message)
-					// 			: toast.success("User created Successfully");
-					// 	})
-					// 	.catch(err => {
-					// 		console.log(err);
-					// 	});
+				
 				}
-			});
+			}).finally(res => {
+				setIsLoading(false)
+			})
 	};
 
 	const userValue = useSelector(state => state.userSlice);
 
-	console.log(userValue)
+	
 
 	return (
 		<div
@@ -314,7 +314,7 @@ const CreateNewUser = () => {
 
 						<div>
 							<Button
-								disabled={false}
+								disabled={isLoading}
 								type='submit'
 								className='w-full py-2 bg-[#3498DB] mt-5 text-white'
 							>
@@ -325,7 +325,7 @@ const CreateNewUser = () => {
 				</div>
 			</div>
 
-			<GlobalLoading isOpen={false} />
+			<GlobalLoading isOpen={isLoading} />
 		</div>
 	);
 };

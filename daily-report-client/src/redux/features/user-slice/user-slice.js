@@ -1,6 +1,5 @@
 /** @format */
 
-
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
 	createUserWithEmailAndPassword,
@@ -12,11 +11,7 @@ const baseRoute = import.meta.env.VITE_BASE_URL;
 
 export const createUser = createAsyncThunk(
 	"userSlice/createUser",
-	async ({
-		...body
-    }) => {
-        
-        
+	async ({ ...body }) => {
 		const setInDB = await fetch(`${baseRoute}/u/create-user`, {
 			method: "POST",
 			headers: {
@@ -28,12 +23,11 @@ export const createUser = createAsyncThunk(
 		});
 		const res = await setInDB.json();
 
-        const email = body?.userEmail 
-        const password = body?.password
-        const avatar = body?.userImage;
-        const userName = body?.userName;
+		const email = body?.userEmail;
+		const password = body?.password;
+		const avatar = body?.userImage;
+		const userName = body?.userName;
 
-        console.log(body)
 
 		if (res.message !== "user already exist") {
 			const currentUserData = await createUserWithEmailAndPassword(
@@ -47,12 +41,16 @@ export const createUser = createAsyncThunk(
 				photoURL: avatar,
 			});
 
+			const result = await fetch(
+				`${baseRoute}/u/user?key=userEmail&value=${email}`
+			);
+			const { user } = await result.json();
 			return {
 				email: currentUserData?.user?.email,
 				name: currentUserData?.user?.displayName,
-				role,
-				workStationName,
-				userServiceID,
+				workStationName: user.currentWorkStation,
+				userServiceID: user.userServiceID,
+				role: user.role,
 			};
 		} else {
 			throw new Error("User already exists");
@@ -60,38 +58,35 @@ export const createUser = createAsyncThunk(
 	}
 );
 
-
 export const singIn = createAsyncThunk(
 	"userSlice/singIn",
 	async ({ email, password }) => {
-		console.log(email, password);
 		const data = await signInWithEmailAndPassword(auth, email, password);
 
 		const result = await fetch(
-			`${baseRoute}/u/user?key='email'&value=${email}`
+			`${baseRoute}/u/user?key=userEmail&value=${email}`
 		);
-		const userInfo = await result.json();
+		const { user } = await result.json();
 
 		return {
-			name: userInfo.name,
-			email: userInfo.email,
-			busOperatorName: userInfo.busOperatorName,
-			businessReg: userInfo.businessReg,
-			role: userInfo.role,
+			name: user.userName,
+			email: user.userEmail,
+			workStationName: user.currentWorkStation,
+			userServiceID: user.userServiceID,
+			role: user.role,
 		};
 	}
 );
 const initialState = {
 	name: "",
 	email: "",
-    role: "",
-    workStationName: "",
-    userServiceID:"",
+	role: "",
+	workStationName: "",
+	userServiceID: "",
 	isLoading: true,
 	isError: false,
 	error: "",
 };
-
 
 const userStateSlice = createSlice({
 	name: "userSlice",
@@ -105,72 +100,82 @@ const userStateSlice = createSlice({
 			state.userServiceID = payload.userServiceID;
 			state.isLoading = payload.isLoading;
 		},
-        logOut: state => {
-			state.name = '';
-			state.email = '';
-			state.workStationName = '';
-			state.userServiceID = '';
-			state.role = '';
+		logOut: state => {
+			state.name = "";
+			state.email = "";
+			state.workStationName = "";
+			state.userServiceID = "";
+			state.role = "";
 			state.isLoading = false;
 		},
 
 		toggleIsLoading: (state, { payload }) => {
-			
-			state.isLoading = payload
-        },
-        
-		extraReducers: builder => {
-			// Add reducers for additional action types here, and handle loading state as needed
-			builder
-				.addCase(createUser.pending, state => {
-					state.name = "";
-					state.email = "";
-					state.role = "";
-					state.isLoading = true;
-					state.isError = false;
-					state.error = "";
-				})
-				.addCase(createUser.fulfilled, (state, { payload }) => {
-					state.name = payload.name;
-					state.email = payload.email;
-					state.role = payload.role;
-					state.isLoading = false;
-					state.isError = false;
-					state.error = "";
-				})
-				.addCase(createUser.rejected, (state, actions) => {
-					state.name = "";
-					state.email = "";
-					state.role = "";
-					state.isLoading = false;
-					state.isError = true;
-					state.error = actions.error.message;
-				})
-				.addCase(singIn.pending, state => {
-					state.name = "";
-					state.email = "";
-					state.role = "";
-					state.isLoading = true;
-					state.isError = false;
-					state.error = "";
-				})
-				.addCase(singIn.fulfilled, (state, { payload }) => {
-					state.name = payload.name;
-					state.email = payload.email;
-					state.role = payload.role;
-					state.isLoading = false;
-					state.isError = false;
-					state.error = "";
-				})
-				.addCase(singIn.rejected, (state, actions) => {
-					state.name = "";
-					state.email = "";
-					state.role = "";
-					state.isLoading = false;
-					state.isError = true;
-					state.error = actions.error.message;
-				});
+			state.isLoading = payload;
 		},
+	},
+	extraReducers: builder => {
+		// Add reducers for additional action types here, and handle loading state as needed
+		builder
+			.addCase(createUser.pending, state => {
+				state.name = "";
+				state.email = "";
+				state.role = "";
+				state.workStationName = "";
+				state.userServiceID = "";
+				state.isLoading = true;
+				state.isError = false;
+				state.error = "";
+			})
+			.addCase(createUser.fulfilled, (state, { payload }) => {
+				state.name = payload.name;
+				state.email = payload.email;
+				state.role = payload.role;
+				state.workStationName = payload.workStationName;
+				state.userServiceID = payload.userServiceID;
+				state.isLoading = false;
+				state.isError = false;
+				state.error = "";
+			})
+			.addCase(createUser.rejected, (state, actions) => {
+				state.name = "";
+				state.email = "";
+				state.role = "";
+				state.workStationName = "";
+				state.userServiceID = "";
+				state.isLoading = false;
+				state.isError = true;
+				state.error = actions.error.message;
+			})
+			.addCase(singIn.pending, state => {
+				state.name = "";
+				state.email = "";
+				state.role = "";
+				state.workStationName = "";
+				state.userServiceID = "";
+				state.isLoading = true;
+				state.isError = false;
+				state.error = "";
+			})
+			.addCase(singIn.fulfilled, (state, { payload }) => {
+				state.name = payload.name;
+				state.email = payload.email;
+				state.role = payload.role;
+				state.workStationName = payload.workStationName;
+				state.userServiceID = payload.userServiceID;
+				state.isLoading = false;
+				state.isError = false;
+				state.error = "";
+			})
+			.addCase(singIn.rejected, (state, actions) => {
+				state.name = "";
+				state.email = "";
+				state.role = "";
+				state.workStationName = "";
+				state.userServiceID = "";
+				state.isLoading = false;
+				state.isError = true;
+				state.error = actions.error.message;
+			});
 	},
 });
 

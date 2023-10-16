@@ -4,28 +4,66 @@ import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import useChangeNavStatus from "../../hooks/useChangeNavStatus/useChangeNavStatus";
 import { changeNavState } from "../../redux/features/nav-value-state/navValueSlice";
-import { Button, Radio } from "@mui/material";
-import { useState } from "react";
-import { useCreateNewUserMutation } from "../../redux/createApi/createApi";
+import { Button } from "@mui/material";
+import { useEffect, useState } from "react";
+
 import GlobalLoading from "../../Shared/global-loading/global-loading";
-import axios from "axios";
-import toast from "react-hot-toast";
-import { createUser, singIn } from "../../redux/features/user-slice/user-slice";
-import { useNavigate, useParams } from "react-router-dom";
+
+import {
+	setUser,
+	singIn,
+	toggleIsLoading,
+} from "../../redux/features/user-slice/user-slice";
+import { useNavigate } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
+import auth from "../../firebase.config/firebase.config";
+import LoadingDataFetch from "../../Shared/loading-data-fetch/loading-data-fetch";
+import { useGetSingleUserQuery } from "../../redux/createApi/createApi";
 
 const CreateNewUser = () => {
 	const navigate = useNavigate();
+	const { isLoading, email } = useSelector(state => state.userSlice);
 
-	const { isLoading } = useSelector(state => state.userSlice);
 	//change automatically nav name and state
 	const dispatch = useDispatch();
 	useChangeNavStatus(dispatch, changeNavState, true, "CREATE NEW USER");
 
-	const [selectedGender, setSelectedGender] = useState("male");
-	const handleChange = event => {
-		setSelectedGender(event.target.value);
-	};
+	const [userEmail, setUserEmail] = useState("");
+	useEffect(() => {
+		onAuthStateChanged(auth, user => {
+			if (user) {
+				setUserEmail(user.email);
+			} else {
+				dispatch(toggleIsLoading(false));
+			}
+		});
+	}, [dispatch]);
 
+	const { data: userInfo } = useGetSingleUserQuery({
+		key: "userEmail",
+		value: userEmail,
+	});
+
+	useEffect(() => {
+		userInfo?.user &&
+			dispatch(
+				setUser({
+					workStationName: userInfo?.user?.currentWorkStation,
+					userServiceID: userInfo?.user?.userServiceID,
+					email: userInfo?.user?.userEmail,
+					name: userInfo?.user?.userName,
+					role: userInfo?.user?.role,
+					isLoading: false,
+				})
+			);
+	}, [userInfo, dispatch]);
+
+
+	useEffect(() => {
+		if (email) {
+			navigate("/dashboard");
+		}
+	}, [email, navigate]);
 	//
 	const {
 		register,
@@ -37,12 +75,14 @@ const CreateNewUser = () => {
 		const { email, password } = data;
 		dispatch(
 			singIn({
+				// Fix the typo here from singIn to signIn
 				email,
 				password,
 			})
 		)
 			.then(response => {
 				if (response && !response.error) {
+					console.log(response && !response.error);
 					// Signup was successful, navigate to the home page
 					navigate("/dashboard");
 				} else {
@@ -51,10 +91,10 @@ const CreateNewUser = () => {
 			})
 			.catch(err => {});
 	};
-	const userValue = useSelector(state => state.userSlice);
 
-	
-
+	if (isLoading) {
+		return <LoadingDataFetch />;
+	}
 	return (
 		<div
 			style={{

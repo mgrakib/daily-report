@@ -33,7 +33,7 @@ const UserHistory = () => {
 	}); // api request for track user on service id
 
 
-	console.log(singleUser);
+	
 
     const user = singleUser?.user;
     const { data: userPreviousWorkStation = [] } =
@@ -44,7 +44,7 @@ const UserHistory = () => {
     const previousStations = Array.isArray(a) ? [...a] : [];
     previousStations.pop()
     
-
+console.log(user);
 
 	return (
 		<div
@@ -59,7 +59,7 @@ const UserHistory = () => {
 				<div className='text-dark-common-color p-10 max-w-5xl mx-auto '>
 					<div className={`grid grid-cols-3 gap-x-10 gap-y-7`}>
 						{/* user Email  */}
-						{role==='ADMIN' && (
+						{role === "ADMIN" && (
 							<form className='font-light mt-7 '>
 								<div>
 									<div>
@@ -141,14 +141,31 @@ const UserHistory = () => {
 								</div>
 								{/* current station  */}
 								<div className=' border border-gray-color rounded shadow-[0_1px_5px_#ffffff1f] bg-[#EBEBEB] col-span-1 row-span-1  text-dashboard-color pb-2'>
-									<div className=' border-b border-gray-color '>
-										<div className='px-2'>
+									<div className=' px-2 py-1 flex items-start justify-between border-b border-gray-color '>
+										<div className=''>
 											<h2 className='font-bold'>
 												Current Station_
 											</h2>
 											<h1 className='font-bold text-xl'>
 												{user?.currentWorkStation}
 											</h1>
+										</div>
+
+										<div
+											className={`py-1 px-2 ${
+												user?.profileStatus ===
+												"PENDING"
+													? "bg-secondary-color text-dark-common-color"
+													: "bg-green-500"
+											} font-bold text-[12px] rounded relative`}
+										>
+											<div className='absolute -left-1 -bottom-1'>
+												<span className='relative flex h-3 w-3'>
+													<span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-dashboard-color opacity-75'></span>
+													<span className='relative inline-flex rounded-full h-3 w-3 bg-dashboard-color'></span>
+												</span>
+											</div>
+											{user?.profileStatus}
 										</div>
 									</div>
 

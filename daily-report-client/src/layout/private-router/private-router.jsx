@@ -46,6 +46,8 @@ const PrivateRouter = ({ children }) => {
 				})
 			);
 	}, [userInfo, dispatch]);
+
+	
 	if (isLoading) {
 		return <LoadingDataFetch  isOpen/>
 	}
